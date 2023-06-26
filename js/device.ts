@@ -5,6 +5,8 @@
 //  date: 2023-6-25
 //
 
+import { registration_record_type } from "./registration_form";
+
 /**
  *  设备优先级
  *  USER 用户级
@@ -40,16 +42,16 @@ enum device_type
  */
 class device_buffer
 {
-    mBuffer: Array<any>;
+    private mBuffer: Array<any>;
 
-    constructor() {}
+    constructor() { }
 
     /**
      * write
      * @param data 添加的数据
      * 写入数据
      */
-    write(data: any)
+    write(data: any): void
     {
         this.mBuffer.push(data);
     }
@@ -59,7 +61,7 @@ class device_buffer
      * @returns 最新的数据
      * 读取队列头的数据
      */
-    read()
+    read(): device
     {
         let data: any = this.mBuffer[0];
         this.mBuffer.pop();
@@ -70,7 +72,7 @@ class device_buffer
      * clear
      * 清空缓冲区
      */
-    clear()
+    clear(): void
     {
         this.mBuffer.splice(0, this.mBuffer.length);
     }
@@ -81,9 +83,58 @@ class device_buffer
  */
 class device
 {
-    mPriority: device_priority; /* 优先级 */
-    mName: string;  /* 设备名 */
-    mType: device_type; /* 设备类型 */
+    private mPriority: device_priority; /* 优先级 */
+    private mName: string;  /* 设备名 */
+    private mType: device_type; /* 设备类型 */
+    protected mHandles: Map<string, Function>;    /* 回调函数 */
+
+    /**
+     * get_handle
+     * @returns 回调函数
+     */
+    get_handle() { return this.mHandles; }
+
+    /**
+     * get_name
+     * @returns 设备名
+     */
+    get_name(): string { return this.mName; }
+
+    /**
+     * get_type
+     * @returns type 设备类型
+     */
+    get_type(): device_type { return this.mType; }
+
+    /**
+     * get_priority
+     * @returns 设备优先级
+     */
+    get_priority(): device_priority { return this.mPriority; }
+
+    /**
+     * set_name
+     * @param name 设备名
+     */
+    set_name(name: string): void { this.mName = name; }
+
+    /**
+     * set_type
+     * @param type 设备类型
+     */
+    set_type(type: device_type): void { this.mType = type; }
+
+    /**
+     * set_priority
+     * @param priority 设备优先级
+     */
+    set_priority(priority: device_priority): void { this.mPriority = priority; }
+
+    /**
+     * set_handle
+     * @param handles 回调函数
+     */
+    set_handle(handles: Map<string, Function>): void { this.mHandles = handles; }
 
     /* 构造函数 */
     constructor(name: string, type: device_type, priority: device_priority) 
@@ -92,6 +143,18 @@ class device
         this.mType = type;
         this.mPriority = priority;
     }
+
+    /**
+     *  set
+     *  配置当前设备的回调函数进行事件处理
+     */
+    set(): void { };
+
+    /**
+     * cls
+     * 删除该设备的回调函数
+     */
+    cls(name: string): void { };
 
 }
 

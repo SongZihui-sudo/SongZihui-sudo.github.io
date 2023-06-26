@@ -45,11 +45,11 @@ enum registration_record_type
  */
 class registration_record
 {
-    mType: registration_record_type;
-    mValue: any;
-    mKey: any;
-    mNext: Map<string, registration_record>;
-    mBranch: string;
+    private mType: registration_record_type;
+    private mValue: any;
+    private mKey: any;
+    private mNext: Map<string, registration_record>;
+    private mBranch: string;
 
     /* 构造 */
     constructor(type: registration_record_type = registration_record_type.REG_SZ, value: any = "", key: any = "", branch: string = "")
@@ -59,6 +59,66 @@ class registration_record
         this.mKey = key;        /* 记录键 */
         this.mBranch = branch;  /* 记录所属分支 */
     }
+
+    /**
+     * get_key
+     * @returns 该记录的键
+     */
+    get_key(): any { return this.mKey; }
+
+    /**
+     * get_value
+     * @returns 该记录的值
+     */
+    get_value(): any { return this.mValue; }
+
+    /**
+     * get_type
+     * @returns 该记录的类型 
+     */
+    get_type(): registration_record_type { return this.mType; }
+
+    /**
+     * get_next
+     * @returns 该记录的next指针 
+     */
+    get_next(): Map<string, registration_record> { return this.mNext; }
+
+    /**
+     * get_branch
+     * @returns 该记录所属分支
+     */
+    get_branch(): string { return this.mBranch; }
+
+    /**
+     * set_key
+     * @param key 记录的键
+     */
+    set_key(key: any) { this.mKey = key; }
+
+    /**
+     * set_value
+     * @param value 记录的值
+     */
+    set_value(value: any) { this.mValue = value; }
+
+    /**
+     * set_type
+     * @param type 记录类型
+     */
+    set_type(type: registration_record_type) { this.mType = type; }
+
+    /**
+     * set_next
+     * @param next 记录的next指针
+     */
+    set_next(next: Map<string, registration_record>) { this.mNext = next; }
+
+    /**
+     * set_branch
+     * @param branch 记录所属分支
+     */
+    set_branch(branch: string) { this.mBranch = branch; }
 };
 
 /**
@@ -66,7 +126,7 @@ class registration_record
  */
 class registration_form
 {
-    mDict: Map<string, registration_record>;
+    private mDict: Map<string, registration_record>;
 
     /* 构造 */
     constructor()
@@ -102,18 +162,18 @@ class registration_form
             if (tmp.has(element))
             {
                 last = tmp[element];
-                tmp = last.mNext;
+                tmp = last.get_next();
             }
             else
             {
                 tmp.set(element, new registration_record(registration_record_type.REG_SZ, "", element, pre));
                 last = tmp[element];
-                tmp = last.mNext;
+                tmp = last.get_next();
             }
             pre = element;
         }
-        new_record.mBranch = pre;
-        last.mNext.set(new_record.mKey, new_record);
+        new_record.set_branch(pre);
+        last.get_next().set(new_record.get_key(), new_record);
     }
 
     /**
@@ -138,7 +198,7 @@ class registration_form
             if (tmp.has(element))
             {
                 last = tmp[element];
-                tmp = last.mNext;
+                tmp = last.get_next();
             }
             else
             {
@@ -147,7 +207,7 @@ class registration_form
             }
             pre = element;
         }
-        last.mNext.delete(path[path.length - 1]);
+        last.get_next().delete(path[path.length - 1]);
     }
 
     /**
@@ -172,7 +232,7 @@ class registration_form
             if (tmp.has(element))
             {
                 last = tmp[element];
-                tmp = last.mNext;
+                tmp = last.get_next();
             }
             else
             {
@@ -207,7 +267,7 @@ class registration_form
             if (tmp.has(element))
             {
                 last = tmp[element];
-                tmp = last.mNext;
+                tmp = last.get_next();
             }
             else
             {
@@ -216,7 +276,13 @@ class registration_form
             }
             pre = element;
         }
-        new_record.mBranch = pre;
+        new_record.set_branch(pre);
         last = new_record;
     }
 };
+
+let global_registration_form: registration_form = new registration_form();
+
+export { global_registration_form };
+
+export { registration_form, registration_record, registration_record_type, registration_record_branch };
