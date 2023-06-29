@@ -26,7 +26,6 @@ class mouse extends device
     */
     set(): void
     {
-        super.mHandles.set("mousedown", this.right_menu);
         document.addEventListener("mousedown", this.right_menu);
     }
 
@@ -34,29 +33,16 @@ class mouse extends device
      * cls
      * 删除该设备的回调函数
      */
-    cls(name: string): void
+    cls(): void
     {
-        if (name == "") 
-        {
-            for (let index = 0; index < super.mHandles.size; index++)
-            {
-                document.removeEventListener(super.mHandles.keys[index], super.mHandles.values[index]);
-            }
-            return;
-        }
-        if (!super.mHandles.has(name)) 
-        {
-            console.log("the key does not exist!");
-            return;
-        }
-        document.removeEventListener(name, super.mHandles[name]);
+        document.removeEventListener("mousedown", this.right_menu);
     }
 
     /**
      * 设备鼠标右键菜单
      * @param table 菜单项
      */
-    right_menu(event)
+    right_menu(event: { button: number; })
     {
         if (event.button == 2) 
         {

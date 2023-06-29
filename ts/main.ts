@@ -4,10 +4,3 @@ import { mouse } from "./mouse";
 import { global_registration_form } from "./registration_form";
 
 let gloal_device_manager: device_manager = new device_manager([new mouse("mouse", device_type.INPUT, device_priority.CORE)]);
-
-function main() 
-{
-    console.log("hello world!");
-}
-
-main();

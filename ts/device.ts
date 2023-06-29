@@ -42,7 +42,7 @@ enum device_type
  */
 class device_buffer
 {
-    private mBuffer: Array<any>;
+    private mBuffer: Array<any> = [];
 
     constructor() { }
 
@@ -86,13 +86,15 @@ class device
     private mPriority: device_priority; /* 优先级 */
     private mName: string;  /* 设备名 */
     private mType: device_type; /* 设备类型 */
-    protected mHandles: Map<string, Function>;    /* 回调函数 */
 
     /**
-     * get_handle
-     * @returns 回调函数
+     * toString
+     * @returns 字符串
      */
-    get_handle() { return this.mHandles; }
+    toString(): string
+    {
+        return this.mName + "/" + device_type[this.mType] + "/" + device_priority[this.mPriority];
+    }
 
     /**
      * get_name
@@ -129,12 +131,6 @@ class device
      * @param priority 设备优先级
      */
     set_priority(priority: device_priority): void { this.mPriority = priority; }
-
-    /**
-     * set_handle
-     * @param handles 回调函数
-     */
-    set_handle(handles: Map<string, Function>): void { this.mHandles = handles; }
 
     /* 构造函数 */
     constructor(name: string, type: device_type, priority: device_priority) 

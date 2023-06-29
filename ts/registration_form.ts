@@ -48,7 +48,7 @@ class registration_record
     private mType: registration_record_type;
     private mValue: any;
     private mKey: any;
-    private mNext: Map<string, registration_record>;
+    private mNext: Map<string, registration_record> = new Map<string, registration_record>();
     private mBranch: string;
 
     /* 构造 */
@@ -126,7 +126,7 @@ class registration_record
  */
 class registration_form
 {
-    private mDict: Map<string, registration_record>;
+    private mDict: Map<string, registration_record> = new Map<string, registration_record>;
 
     /* 构造 */
     constructor()
@@ -161,13 +161,13 @@ class registration_form
             let element: string = path[index];
             if (tmp.has(element))
             {
-                last = tmp[element];
+                last = tmp.get(element)!;
                 tmp = last.get_next();
             }
             else
             {
                 tmp.set(element, new registration_record(registration_record_type.REG_SZ, "", element, pre));
-                last = tmp[element];
+                last = tmp.get(element)!;
                 tmp = last.get_next();
             }
             pre = element;
@@ -197,7 +197,7 @@ class registration_form
             let element: string = path[index];
             if (tmp.has(element))
             {
-                last = tmp[element];
+                last = tmp.get(element)!;
                 tmp = last.get_next();
             }
             else
@@ -231,7 +231,7 @@ class registration_form
             let element: string = path[index];
             if (tmp.has(element))
             {
-                last = tmp[element];
+                last = tmp.get(element)!;
                 tmp = last.get_next();
             }
             else
@@ -266,7 +266,7 @@ class registration_form
             let element: string = path[index];
             if (tmp.has(element))
             {
-                last = tmp[element];
+                last = tmp.get(element)!;
                 tmp = last.get_next();
             }
             else

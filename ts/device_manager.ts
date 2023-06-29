@@ -9,7 +9,8 @@ import { device } from "./device";
 
 class device_manager 
 {
-    mDevices: Map<string, device>;
+    private mDevices: Map<string, device> = new Map<string, device>();
+
     constructor(devices: Array<device>) 
     {
         for (let index = 0; index < devices.length; index++)
@@ -48,7 +49,8 @@ class device_manager
             console.log("Device does not exist!");
             return -1;
         }
-        this.mDevices[name].cls("");
+        let cur: device = this.mDevices.get(name)!;
+        cur.cls("");
         this.mDevices.delete(name);
     }
 
@@ -59,12 +61,12 @@ class device_manager
      */
     get(name: string)
     {
-        if (!this.mDevices.has(name)) 
+        if (!this.mDevices.has(name))
         {
             console.log("Device does not exist!");
             return -1;
         }
-        return this.mDevices[name];
+        return this.mDevices.get(name);
     }
 
     /**
@@ -80,8 +82,9 @@ class device_manager
             console.log("Device does not exist!");
             return -1;
         }
-        this.mDevices[name].set();
-        this.mDevices[name] = device;
+        let cur: device = this.mDevices.get(name)!;
+        cur.set();
+        cur = new_device;
     }
 }
 

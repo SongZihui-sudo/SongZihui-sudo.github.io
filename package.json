@@ -1,5 +1,13 @@
 {
   "dependencies": {
     "@right-menu/core": "^0.0.7"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.4",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "scripts": {
+    "buid": "webpack"
   }
 }
