@@ -4,7 +4,7 @@ module.exports = {
     entry: './ts/main.ts',
     output: {
         filename: 'main.js',
-        path: path.resolve('dist') //获取输出路径
+        path: path.resolve(__dirname, 'dist') //获取输出路径
     },
     mode: 'development',
     module: {
