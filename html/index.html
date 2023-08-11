@@ -1,16 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PromHub</title>
-    <link rel="stylesheet" type="text/css" href="../css/index.css">
-</head>
-<body>
-    <h1> PromHub </h1>
-    <h2> <a href="./about.html"> 关于我 </a> </h2>
-    <h2> 归档 </h2>
-    <a href="./test.html"> 测试 </a> <br>
-</body>
-    <script type="text/javascript" src="../js/ts/main.js"></script>
-</html>
+<html>
+    <head>
+        <title>98.css example</title>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="https://unpkg.com/98.css" />
+        <link rel="stylesheet" href="../css/index.css" />
+    </head>
+
+    <body>
+        <div class="title-bar inactive">
+            <div class="title-bar-text">Promhub 编程公社</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <ul class="tree-view">
+            <li> <a href="./about.html"> 关于我 </a> </li>
+            <li><strong style="color: purple">✨ Whatever ✨</strong></li>
+            <li>
+                <summary> 最新 </summary>
+                <ul>
+                    <li> 暂无 </li>
+                </ul>
+                <li>
+                    <details>
+                        <summary> 归档 </summary>
+                        <ul>
+                            <li><a href="./test.html"> Test </a> </li>
+                        </ul>
+                    </details>
+
+                </li>
+            </ul>
+        </body>
+    </html>
