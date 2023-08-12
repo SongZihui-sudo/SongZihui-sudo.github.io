@@ -1,65 +1,111 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Promhub 编程公社</title>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="https://unpkg.com/98.css" />
-        <link rel="stylesheet" href="./css/index.css" />
-    </head>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1G06Y1QTP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+<head>
+    <title>Promhub 编程公社</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://unpkg.com/98.css" />
+    <link rel="stylesheet" href="./css/index.css" />
+</head>
 
-        gtag('config', 'G-P1G06Y1QTP');
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1G06Y1QTP"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-P1G06Y1QTP');
 </script>
 
-    <body>
-        <div class="title-bar inactive">
-            <div class="title-bar-text">Promhub 编程公社</div>
+<body>
+    <div class="title-bar inactive">
+        <div class="title-bar-text">Promhub 编程公社</div>
+        <div class="title-bar-controls">
+            <button aria-label="Close"></button>
+        </div>
+    </div>
+    <ul class="tree-view">
+        <li> <a href="./about.html"> 关于我 </a> </li>
+        <li><strong style="color: purple">✨ Whatever ✨</strong></li>
+        <li>
+            <summary> 最新 </summary>
+            <ul>
+                <li> 暂无 </li>
+            </ul>
+        <li>
+            <details>
+                <summary> 归档 </summary>
+                <ul>
+                    <li><a href="./test.html"> Test </a> </li>
+                </ul>
+            </details>
+        </li>
+    </ul>
+    <br>
+    <div class="window" style="width: 100%; height: 100%">
+        <div class="title-bar">
+            <div class="title-bar-text">最新博客</div>
             <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
                 <button aria-label="Close"></button>
             </div>
         </div>
-        <ul class="tree-view">
-            <li> <a href="./about.html"> 关于我 </a> </li>
-            <li><strong style="color: purple">✨ Whatever ✨</strong></li>
-            <li>
-                <summary> 最新 </summary>
-                <ul>
-                    <li> 暂无 </li>
-                </ul>
+        <iframe id="page" src="./page/test.htm" width="100%" height="100%" frameborder="0" allowfullscreen sandbox>
+        </iframe>
+    </div>
+    <br>
+    <div class="window" style="width: 100%; height: 100%">
+        <div class="title-bar">
+            <div class="title-bar-text">留言板</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="field-row">
+            <ul>
                 <li>
-                    <details>
-                        <summary> 归档 </summary>
-                        <ul>
-                            <li><a href="./test.html"> Test </a> </li>
-                        </ul>
-                    </details>
+                    <div class="field-row-stacked" style="width: 200px">
+                        <label for="text17">姓名：</label>
+                        <input id="text17" type="text" />
+                    </div>
+                </li>
+                <br>
+                <li>
+                    <div class="field-row-stacked" style="width: 200px">
+                        <label for="text17">邮箱：必填</label>
+                        <input id="text17" type="text" />
+                    </div>
+                </li>
+                <br>
+                <li>
+                    <div class="field-row-stacked" style="width: 200px">
+                        <label for="text20">留言：必填</label>
+                        <textarea id="text20" rows="8"></textarea>
+                    </div>
                 </li>
             </ul>
-            <br>
-            <div class="window" style="width: 100%; height: 100%">
-                <div class="title-bar">
-                    <div class="title-bar-text">最新博客</div>
-                    <div class="title-bar-controls">
-                        <button aria-label="Minimize"></button>
-                        <button aria-label="Maximize"></button>
-                        <button aria-label="Close"></button>
-                    </div>
-                </div>
-                <div class="window-body">
-                    <iframe src="./test.html"
-                        width="100%"
-                        height="100%"
-                        frameborder="0"
-                        allowfullscreen
-                        sandbox>
-                    </iframe>
-                </div>
-            </div>
-        </body>
-    </html>
+        </div>
+        <input type="submit" style="position:relative;
+        left:50px; bottom: 5px;" />
+        <input type="reset" style="position:relative;
+        left:70px; bottom: 5px;" />
+    </div>
+</body>
+<script>
+    function changeFrameHeight() {
+        var ifm = document.getElementById("page");
+        ifm.height = document.documentElement.clientHeight / 2;
+    }
+    window.onload = function () {
+        changeFrameHeight();
+    }
+    window.onresize = function () {
+        changeFrameHeight();
+    }
+</script>
+
+</html>
