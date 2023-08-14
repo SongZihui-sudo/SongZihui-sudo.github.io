@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <title>Promhub 编程公社</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="https://unpkg.com/98.css" />
-    <link rel="stylesheet" href="./css/index.css" />
-</head>
+    <head>
+        <title>Promhub 编程公社</title>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="https://unpkg.com/98.css" />
+        <link rel="stylesheet" href="./css/index.css" />
+    </head>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1G06Y1QTP"></script>
-<script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1G06Y1QTP"></script>
+    <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
@@ -18,53 +18,65 @@
     gtag('config', 'G-P1G06Y1QTP');
 </script>
 
-<body>
-    <div class="window" id="main_window" style="width: 100%;">
-        <div class="title-bar">
-            <div class="title-bar-text">Promhub 编程公社</div>
-            <div class="title-bar-controls">
-                <button aria-label="Minimize"></button>
-                <button aria-label="Maximize"></button>
-                <button aria-label="Close"></button>
+    <body>
+        <div class="window" id="main_window" style="width: 100%;">
+            <div class="title-bar">
+                <div class="title-bar-text">Promhub 编程公社</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
             </div>
-        </div>
-        <div class="window-body">
-            <ul class="tree-view">
-                <li> <a href="./about.html"> 关于我 </a> </li>
-                <li><strong style="color: purple">✨ Whatever ✨</strong></li>
-                <li>
-                    <summary> 最新 </summary>
-                    <ul>
-                        <li> <a href="./隐函数求导.html"> 隐函数求导 </a> </li>
-                    </ul>
-                <li>
-                    <details>
-                        <summary> 归档 </summary>
+            <div class="window-body">
+                <ul class="tree-view">
+                    <li> <a href="./about.html"> 关于我 </a> </li>
+                    <li><strong style="color: purple">✨ Whatever ✨</strong></li>
+                    <li>
+                        <summary> 最新 </summary>
                         <ul>
-                            <li><a href="./test.html"> Test </a> </li>
+                            <li> <a href="./抽象行列式计算.html"> 抽象行列式计算 </a> </li>
+                            <li> <a href="./隐函数求导.html"> 隐函数求导 </a> </li>
+                        </ul>
+                        <li>
                             <details>
-                                <summary> 高等数学 </summary>
+                                <summary> 归档 </summary>
                                 <ul>
-                                    <li> <a href="./隐函数求导.html"> 隐函数求导 </a> </li>
+                                    <li><a href="./test.html"> Test </a> </li>
+                                    <details>
+                                        <summary> 高等数学 </summary>
+                                        <ul>
+                                            <li> <a href="./隐函数求导.html"> 隐函数求导
+                                                </a> </li>
+                                        </ul>
+                                    </details>
+                                    <details>
+                                        <summary> 线性代数 </summary>
+                                        <ul>
+                                            <li> <a href="./抽象行列式计算.html">
+                                                    抽象行列式计算
+                                                </a> </li>
+                                        </ul>
+                                    </details>
                                 </ul>
                             </details>
-                        </ul>
-                    </details>
-                </li>
-                <iframe id="page" src="./page/高等数学/隐函数求导.htm" width="100%" height="100%" frameborder="0"
-                    allowfullscreen>
-                </iframe>
-                <div class="status-bar">
-                    <p class="status-bar-field">connect:
-                        1751122876@qq.com</p>
-                    <p class="status-bar-field"><a href="https://icp.gov.moe/?keyword=20230580"
-                            target="_blank">萌ICP备20230580号</a></p>
+                        </li>
+                        <iframe id="page" src="./page/线性代数/抽象行列式计算.htm"
+                            width="100%" height="100%" frameborder="0"
+                            allowfullscreen>
+                        </iframe>
+                        <div class="status-bar">
+                            <p class="status-bar-field">connect:
+                                1751122876@qq.com</p>
+                            <p class="status-bar-field"><a
+                                    href="https://icp.gov.moe/?keyword=20230580"
+                                    target="_blank">萌ICP备20230580号</a></p>
+                        </div>
+                    </ul>
                 </div>
-            </ul>
-        </div>
-    </div>
-</body>
-<script>
+            </div>
+        </body>
+        <script>
     function changeFrameHeight() {
         var ifm = document.getElementById("page");
         ifm.height = document.documentElement.clientHeight * 0.8;
@@ -79,4 +91,4 @@
     }
 </script>
 
-</html>
+    </html>
