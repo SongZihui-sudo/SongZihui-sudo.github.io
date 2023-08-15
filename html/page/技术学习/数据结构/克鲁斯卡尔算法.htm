@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+        <!-- and it's easy to individually load additional languages -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+
+        <script>hljs.highlightAll();</script>
+        <title>克鲁斯卡尔算法</title>
+    </head>
+    <body>
+        <h1> 克鲁斯卡尔算法 </h1>
+        <a
+            href="https://zh.wikipedia.org/zh-hans/%E5%85%8B%E9%B2%81%E6%96%AF%E5%85%8B%E5%B0%94%E6%BC%94%E7%AE%97%E6%B3%95">
+            维基百科 </a>
+        <p>
+            克鲁斯卡尔算法也是一种用来寻找最小生成树的算法。但是与普利姆算法不同的是，它是把边的权值进行排列，每次选取权值最小的边(不会形成环)。
+        </p>
+        <h2> 伪算法 </h2>
+        <pre>
+            <code class="language-c">
+                E V
+                n = V.size()
+                i = 0
+                Enew = {}, Vnew = {}
+                while( i < n )
+                {
+                    E = sort(E)
+                    Ecur = getMin(E)
+                    if (Ecur.u not in Vnew and Ecur not in Vnew)
+                    {
+                        Enew.append(Ecur)
+                        Vnew.append(Ecur.v)
+                        Vnew.append(Ecur.u)
+                    }
+                    i++
+                }
+            </code>
+        </pre>
+        <h2> 流程演示 </h2>
+        有这样的一个图：<br>
+        <img
+            src="https://private-user-images.githubusercontent.com/77034643/260726699-21934af7-7420-4812-b17d-55241a9ed6e0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTEiLCJleHAiOjE2OTIxMTMxNzEsIm5iZiI6MTY5MjExMjg3MSwicGF0aCI6Ii83NzAzNDY0My8yNjA3MjY2OTktMjE5MzRhZjctNzQyMC00ODEyLWIxN2QtNTUyNDFhOWVkNmUwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFJV05KWUFYNENTVkVINTNBJTJGMjAyMzA4MTUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjMwODE1VDE1MjExMVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWQzOGVhODc4M2Q2NTYwYjYxNjc0ZjJiNzE0YTExYWJhNDI1ZjJkMGZkOTc2ODA2ODkyMTEzZWE2NzcxMmZlMTgmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.BlSyYeEbQ5zHm4j6QnBqpRMrxlu7ftztU6G4Y4ObTss"
+            height="300px">
+        <pre>
+            <code class="language-c">
+                1. 最短的边为 (F,D)
+                2. 最短的边为(A,F),(F,B)，任意选择(A,F)
+                3. 最短的边为(F,B)
+                4. 最短边为(A,B),(D,E),因为选择 (A,B) 会形成环，所以选择(D,E)
+                5. 最短边为(F,G)
+            </code>
+        </pre>
+        生成的最小生成树为: <br>
+        <img
+            src="https://private-user-images.githubusercontent.com/77034643/260761685-b1701e49-a933-4044-8943-8f71f79c9859.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTEiLCJleHAiOjE2OTIxMTM3MDQsIm5iZiI6MTY5MjExMzQwNCwicGF0aCI6Ii83NzAzNDY0My8yNjA3NjE2ODUtYjE3MDFlNDktYTkzMy00MDQ0LTg5NDMtOGY3MWY3OWM5ODU5LmpwZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFJV05KWUFYNENTVkVINTNBJTJGMjAyMzA4MTUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjMwODE1VDE1MzAwNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWRkNjVkMDM4OGFiOWQ3YzY4OTk0NTZlN2Y3MmEzZDA5NWM1MzcyYThjOWZiNmVmYmNkZTQzZWFlNDc2ZjVhMmQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.7MSaJbvVicdg_CIqAXyyQevHza8eU9xhuPMBqQYvpYE"
+            height="350px">
+    </body>
+</html>
