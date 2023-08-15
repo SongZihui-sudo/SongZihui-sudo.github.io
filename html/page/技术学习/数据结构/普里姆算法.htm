@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+
+    <script>hljs.highlightAll();</script>
+    <title>普里姆算法</title>
+</head>
+
+<body>
+    <h1> 普里姆算法 </h1>
+    <a href="https://zh.wikipedia.org/zh-cn/%E6%99%AE%E6%9E%97%E5%A7%86%E7%AE%97%E6%B3%95"> 维基百科 </a>
+    <p>
+        普利姆算法主要用来在连通图中找一个最小生成树。
+    </p>
+    <p>
+        普利姆算法与克鲁斯卡尔算法不一样的地方在于，普利姆算法是从一个点出发，选择距离这个点权值最小的边，而克鲁斯卡尔算法是将边的权值排序，选择出最小的边。
+    </p>
+    <h2> 伪算法 </h2><br>
+    <p>
+    <pre>
+            <code class="language-c" >
+                Input E, V
+                start: x
+                Enew = {}, Vnew = {x}
+                dst = 0
+                while Vnew != V
+                {
+                    Vcur = Vnew[0]
+                    Ecur = getMin(E, Vcur)
+                    dst += Ecur.value
+                    Vnew.append(Ecur.v)
+                    Enew.append(Ecur)
+                }
+            </code>
+        </pre>
+    </p>
+    <h2> 流程演示 </h2>
+    <p>
+        有一个这样的图。<br>
+        <img src="https://private-user-images.githubusercontent.com/77034643/260726699-21934af7-7420-4812-b17d-55241a9ed6e0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTEiLCJleHAiOjE2OTIxMDg5NzgsIm5iZiI6MTY5MjEwODY3OCwicGF0aCI6Ii83NzAzNDY0My8yNjA3MjY2OTktMjE5MzRhZjctNzQyMC00ODEyLWIxN2QtNTUyNDFhOWVkNmUwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFJV05KWUFYNENTVkVINTNBJTJGMjAyMzA4MTUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjMwODE1VDE0MTExOFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTUxYWJhNzY3OTY5OTYwMzI0NWI1ZTFlMDllZjY2OGMyMjgxZWViODZiMzY1OGMxZDcwY2Q0YTRmMGIxMzgyNzMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.4jqEt0CoTnGOl_ZVCXsz-GuuKln9KANvetAHx_uHnlo"
+            height="300px">
+    </p>
+    <p>
+        算法的流程为: <br>
+        从 A 出发, 此时 Enew = {}, Vnew = {A} dst = 0 <br>
+    </p>
+
+    <pre>
+        <code class="language-c" >
+            1.  可选 B F
+                (A, B) + dst > (A, F) + dst
+                选择 F (A,F), dst = (A, B) + dst = 2
+            2.  可选 B, D, G
+                (F, D) + dst < (F, B) + dst < (A, B) + dst < (F,G) + dst
+                选择 D (F,D), dst = (F,D) + dst = 3
+            3.  可选 B, G, E
+                (F, B) + dst < (D, E) + dst < (A,B) + dst = (D,E) + dst
+                选择 B (F, B) dst = (F, B) + dst = 5
+            4.  可选 E, G
+                (D,E) + dst < (F,G) + dst
+                选择 E(D,E), dst = (D,E) + dst = 8
+            5.  可选 G
+                选择 G (F,G), dst = (F, G) + dst = 12
+        </code>
+    </pre>
+    最终得到最小生成树为: <br>
+    <img src="https://private-user-images.githubusercontent.com/77034643/260733936-f22ab4f5-53f6-4961-ba19-e6175686821c.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTEiLCJleHAiOjE2OTIxMDg5NzgsIm5iZiI6MTY5MjEwODY3OCwicGF0aCI6Ii83NzAzNDY0My8yNjA3MzM5MzYtZjIyYWI0ZjUtNTNmNi00OTYxLWJhMTktZTYxNzU2ODY4MjFjLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFJV05KWUFYNENTVkVINTNBJTJGMjAyMzA4MTUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjMwODE1VDE0MTExOFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTY1NmI1OTAyM2NhMzczNDM4Nzk0M2Q0ODFjOTZiYTkyYTA2NjUwZDc0YWIxMGNmMTliYjZhOTE3YWQ2NTk1NTUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.5XPY5eewmROPn2Lz5tr69aCY0q53a81r2jw4LiSATVY" height="400px">
+</body>
+
+</html>
