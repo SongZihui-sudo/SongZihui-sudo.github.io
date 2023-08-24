@@ -9,10 +9,14 @@
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824595287792252"
             crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://unpkg.com/98.css" />
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+        <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
     </head>
 
     <body style="background-color: rgb(0, 118, 118);">
-        <div class="window" style="width: 100%; height: 100%">
+        <div class="window"
+            style="width: 100%; height: 100%;background-color:aliceblue">
             <div class="title-bar">
                 <div class="title-bar-text"><a href="./index.html"
                         style="color:snow;">Promhub 编程公社</a> 普里姆算法</div>
@@ -25,6 +29,7 @@
             <iframe id="page" src="./page/技术学习/数据结构/普里姆算法.htm" width="100%"
                 frameborder="0" allowfullscreen sandbox>
             </iframe>
+            <div id="gitalk-container"></div>
             <div class="status-bar">
                 <p class="status-bar-field">connect:
                     1751122876@qq.com</p>
@@ -44,6 +49,17 @@
     window.onresize = function () {
         changeFrameHeight();
     }
+    const gitalk = new Gitalk({
+        clientID: 'GitHub Application Client ID',
+        clientSecret: 'GitHub Application Client Secret',
+        repo: 'GitHub repo',      // The repository of store comments,
+        owner: 'GitHub repo owner',
+        admin: ['GitHub repo owner and collaborators, only these guys can initialize github issues'],
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+      
+      gitalk.render('gitalk-container')
 </script>
 
 </html>
