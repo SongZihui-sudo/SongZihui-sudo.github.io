@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>在安卓设备上配置termux及proot容器</title>
+    </head>
+    <body>
+        <h1> 在安卓设备上配置termux及proot容器 </h1>
+        <h2> 软件下载： </h2>
+        <a href="https://github.com/termux/termux-app">
+            termux </a> or <a href="https://github.com/hanxinhao000/ZeroTermux">
+            zerotermux </a> <br>
+        <a href="https://github.com/termux/termux-x11"> termux-x11 </a> <br>
+        直接到 github 页面上进行下载并安装。
+        <h2> proot 容器安装 </h2>
+        <p>
+            首先打开 termux 软件，输入命令<code style="color:teal;"> pkg install
+                proot-distro </code>
+            安装 <a href="https://github.com/termux/proot-distro"> proot-distro
+            </a>。<br>
+            然后输入命令<code style="color:teal;"> proot-distro install debian </code>,
+            安装
+            debian（选择这个的原因是之前我试着用了 fedora 和 ubuntu，
+            但都遇到的多多少少的问题，最好选用 debian 比较稳定，另外安装时尽量进行科学上网，否则会非常非常慢）。<br>
+            安装完之后就可以进入系统了，使用命令<code style="color:teal;"> proot-distro login
+                debian </code>
+        </p>
+        <h2> 用户配置(可选) </h2>
+        <p>
+            接前面,我们已经进入到了 proot 的容器里面，这时我们还是 root 用户，在 root
+            用户下很多软件会运行不正常，例如：xmake 会默认不在root下运行，chromium 也要加额外的命令行参数才可以运行。 <br>
+            所以输入命令 <code style="color: teal;"> apt install sudo </code> 安装 sudo<br>
+            安装完之后输入<code style="color: teal;"> adduser </code>,
+            这时就会出来要我们填写用户名与密码一类的信息，跟着走下去就好。<br>
+            我们新添加的用户，还没有进入的 sudo 列表里，所以修改文件<code style="color: teal;">
+                /etc/sudoers </code>, 在 <code style="color: teal;"> root
+                ALL=(ALL) ALL </code>这一行下面添加内容<code style="color: teal;"> 你的用户名
+                ALL=(ALL) ALL </code>
+            这样重新登陆时使用命令 <code style="color: teal;"> proot-distro install debian
+                --user 你的用户名 </code> <br>
+            这样用户就配置好了
+        </p>
+        <h2> 桌面环境配置 </h2>
+        <p>
+            安装 xfce4，使用命令 <code style="color: teal;"> sudo apt install xfce
+            </code>这个过程有点慢，等待一会就行。<br>
+        </p>
+        <h2> termux-x11 配置 </h2>
+            <p>
+                配置 termux-x11 需要退出 proot 容器到 termux 的环境中，输入命令<code
+                    style="color: teal;">
+                    pkg in x11-repo && pkg in termux-x11-nightly.</code>
+            </p>
+            <h3> 进入桌面 </h3>
+            <p>
+                在 termux 中输入<code style="color:teal;"> termux-x11 :0 & </code>, 然后输入<code style="color:teal;"> proot-distro install debian
+                    --user 你的用户名 --shared-tmp </code> 登录 proot 容器 <br>
+                    在输入 <code style="color: teal;"> env DISPLAY=:0 dbus-launch --exit-with-session xfce4-session </code> 打开xfce桌面.
+            </p>
+
+        </code>
+        <h2> 杂项 </h2>
+            <h3> 设置中文及拼音输入法 </h3>
+            输入一下命令安装fcitx5输入法<code style="color: teal;">
+                sudo apt install fcitx5 \
+                fcitx5-chinese-addons \
+                fcitx5-frontend-gtk4 fcitx5-frontend-gtk3 fcitx5-frontend-gtk2 \
+                fcitx5-frontend-qt5</code> <br>
+            然后输入<code style="color: teal;"> im-config </code>，根据提示进行设置.<br>
+            最后是设置环境变量,打开文件<code style="color: teal;">~/.xprofile</code>, 加入如下内容
+            <pre>
+                <code style="color: teal;">
+                    export XMODIFIERS="@im=fcitx"
+                    export GTK_IM_MODULE=fcitx
+                    export QT_IM_MODULE=fcitx
+                </code>
+            </pre>
+            <h3> 硬件加速 </h3>
+                <a href="https://ivonblog.com/posts/termux-virglrenderer/"> Termux以virglrenderer達成GPU 3D硬體加速 </a>
+                根据链接的博客操作即可，但是我在 ubuntu 上没有成功，在 debian 上一次就可以了。
+        <h2> 效果 </h2>
+        <img src="https://user-images.githubusercontent.com/77034643/262907550-81cd5f87-a8c8-4cf9-aca7-72777c01a6c8.jpg" height="100%" width="100%"> 
+        <img src="https://user-images.githubusercontent.com/77034643/262908427-1560eaef-b77a-4929-8aea-736ed92702a6.jpg" height="100%" width="100%">
+    </body>
+</html>

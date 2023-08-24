@@ -62,25 +62,22 @@
         <pre>
         <code class="language-c" >
             1.  可选 B F
-                (A, B) + dst > (A, F) + dst
-                选择 F (A,F), dst = (A, B) + dst = 2
+                · 选择 F 距离 A 最近选择 F
             2.  可选 B, D, G
-                (F, D) + dst < (F, B) + dst < (A, B) + dst < (F,G) + dst
-                选择 D (F,D), dst = (F,D) + dst = 3
+                · 选择 D，因为 D 距离 {A,F} 中的 F 最近。
             3.  可选 B, G, E
-                (F, B) + dst < (D, E) + dst < (A,B) + dst = (D,E) + dst
-                选择 B (F, B) dst = (F, B) + dst = 5
+                · 选择 B， B 距离 {A,F,D}中的 F 最近
             4.  可选 E, G
-                (D,E) + dst < (F,G) + dst
-                选择 E(D,E), dst = (D,E) + dst = 8
+                · 选择 E
             5.  可选 G
-                选择 G (F,G), dst = (F, G) + dst = 12
+                · 选择 G
         </code>
     </pre>
         最终得到最小生成树为: <br>
         <img
             src="https://user-images.githubusercontent.com/77034643/260763038-b2792e2e-b64b-4d64-874e-09618865364b.png"
             height="400px">
+        <cite> 2023-8-24 更新 备注：之前写成了迪杰斯特拉算法。 </cite>
     </body>
 
 </html>
