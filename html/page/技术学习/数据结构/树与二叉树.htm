@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+        integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"
+        integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+        integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+	<title> 树与二叉树 </title>
+</head>
+<body>
+	<h1> 树与二叉树 </h1>
+	<h2> 树的结点个数与结点的度与树的高度 </h2>
+	<h3> 树 </h3>
+	<p> 
+		$$ N = n_{0} + n_{1} + n_{2} + n_{3} + ...... + n_{n} $$ 
+		$$ N = 0 \times n_{0} + 1 \times n_{1} + 2 \times n_{2} + 3 \times n_{3} ...... + n \times n_{n} + 1 $$
+		高为h的树至多有 \(  \frac{m^h-1}{m - 1} \) 个节点 <br>
+		度为m的树在第i层上至多有 \( m^{i-1} \) 个节点 <br>
+		具有n个节点m叉树最小高度为\( log_{m}[n(m-1)+1] \) <br>
+	</p>
+	<h3> 二叉树 </h3>
+	<p>
+		$$ N = n_{0} + n_{1} + n_{2} $$
+		$$ N = n_{1} + 2 \times n_{2} + 1 $$
+		$$ n_{0} = n_{2} + 1 $$
+		非空 k 叉树上的第 k 层至多\( 2^{k-1} \) 个节点. <br>
+		高为 h 的二叉树至多有 \( 2^h - 1 \) 个节点. <br>
+	</p>
+	<h2> 特殊树 </h2>
+	<h3> 完全二叉树 </h3>
+	<p> 
+		$$ h = log_{2}(n + 1) = log_{2}(n) + 1 $$ 
+		当 i > 1 时，i 节点的双亲的 \( index = \left\{\begin{matrix}
+  & i / 2 偶\\
+  & (i -1)/2 奇
+\end{matrix}\right. \)
+	</p>
+	<h3> 线索二叉树 </h3>
+	<p> 对于 n 个节点的线索二叉树，空指针个数有 n + 1 个。 </p>
+	<h3> 高度为 h 只有度为 0 和 2 的结点 </h3>
+	<p> 总结点至少为 \( 2h-1 \)  </p>
+	<h3> 二叉平衡树 </h3>
+	<p> 
+		$$ n_{h} = n_{h - 1} + n_{n - 2} + 1 $$
+		平衡因子是 \( 左右子树的高度之差。 \)
+	</p>
+	<h3> 红黑树 </h3>
+	<p>  </p>
+</body>
+</html>
