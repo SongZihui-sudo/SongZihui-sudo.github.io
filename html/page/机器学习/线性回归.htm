@@ -30,10 +30,10 @@
     <h2> 批量梯度下降 </h2>
     <p> 有前面的成本函数，我们可以先把 b 看作 0，减化这个函数，这样就得到了一个关于 w 的函数，可以绘制出其函数的图像为： </p>
     <img
-        src="https://private-user-images.githubusercontent.com/77034643/307522257-43da034c-ab71-4ba4-99e6-67e7138b2b17.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDg3ODAwNjEsIm5iZiI6MTcwODc3OTc2MSwicGF0aCI6Ii83NzAzNDY0My8zMDc1MjIyNTctNDNkYTAzNGMtYWI3MS00YmE0LTk5ZTYtNjdlNzEzOGIyYjE3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDAyMjQlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwMjI0VDEzMDI0MVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTE2NzY2YmYxZjAyNWI1M2Q4Yzk2MDRjM2FmNzU4MjE5YWQ3ZWU1OGZkYzhkMTU2ODA4NzhjNTZiMTk1MDMyNjUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.uRftFM19vXSC-MvyjgtO-kwDWMFauLTC5aP4akeoYwI">
+        src="https://github.com/SongZihui-sudo/picture-bed/assets/77034643/43da034c-ab71-4ba4-99e6-67e7138b2b17">
     <p> 这样可以看出，当我们的 w 取了一个值时，可以一点一点的沿着函数下降最快的方向找到局部极小值。 </p>
     <p>继续拓展</p>
-    <img src = "https://private-user-images.githubusercontent.com/77034643/307523474-a02d49c3-d547-45f1-887d-0665065cff62.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDg3ODA1MjAsIm5iZiI6MTcwODc4MDIyMCwicGF0aCI6Ii83NzAzNDY0My8zMDc1MjM0NzQtYTAyZDQ5YzMtZDU0Ny00NWYxLTg4N2QtMDY2NTA2NWNmZjYyLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDAyMjQlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwMjI0VDEzMTAyMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWQ0YjE1YmI5NmMxMjQ1OWYxYmJmNTk4MDM3OTk1NTIyODM4YzViMDhlMGI1NDRlYTkxYTMwNzE5NmI0MDE4N2EmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.ZdwirMrdDdtP7Q610hZH_h7Ihe_olUxRwHoupORSqIA">
+    <img src = "https://github.com/SongZihui-sudo/picture-bed/assets/77034643/a02d49c3-d547-45f1-887d-0665065cff62">
     <p>在引入了 b 的时候，这是就是一个碗形。</p>
     $$
     w = w - \alpha \cdot \frac{\partial}{\partial w}j(w, b)     $$
