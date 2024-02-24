@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+
+    <script>hljs.highlightAll();</script>
+    <title>代码实现</title>
+</head>
+
+<body>
+    <b>linear_regression.h</b>
+    <pre>
+    <code class="language-cpp">
+/*
+ * @Author: SongZihui-sudo 1751122876@qq.com
+ * @Date: 2024-02-24 14:48:58
+ * @LastEditors: SongZihui-sudo 1751122876@qq.com
+ * @LastEditTime: 2024-02-24 15:44:26
+ * @FilePath: /linear_regression/src/linear_regression.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置:
+ * https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+#pragma once
+
+#include &lt;tuple&gt;	
+#include &lt;vector&gt;
+
+class linear_regression
+{
+public:
+    linear_regression( const std::vector< std::tuple< double, double > > trains = { },
+                       const std::vector< std::tuple< double, double, double > > tests = { },
+                       const double leaning_rate = 0.5 )
+    {
+        alapa       = leaning_rate;
+        m_train_set = trains;
+        m_test_set  = tests;
+    }
+    ~linear_regression( ){ };
+
+public:
+    void train( );
+
+    void test( );
+
+    double test( const double x );
+
+    double cost( );
+
+    double get_w( ) { return w; }
+
+    double get_b( ) { return b; }
+
+    void set_train_set( const std::vector< std::tuple< double, double > > list )
+    {
+        m_train_set = list;
+    }
+
+    void set_test_set( const std::vector< std::tuple< double, double, double > > list )
+    {
+        m_test_set = list;
+    }
+
+private:
+    double w_diff( );
+
+    double b_diff( );
+
+    double f_w_b( const double x ) { return w * x + b; }
+
+private:
+    std::vector< std::tuple< double, double > > m_train_set;
+    std::vector< std::tuple< double, double, double > > m_test_set;
+    double w = 0;
+    double b = 0;
+    double alapa;
+};
+        </code>
+</pre>
+</body>
+
+<b>linear_regression.c</b>
+<pre>
+    <code class="language-cpp">
+/*
+ * @Author: SongZihui-sudo 1751122876@qq.com
+ * @Date: 2024-02-24 14:48:58
+ * @LastEditors: SongZihui-sudo 1751122876@qq.com
+ * @LastEditTime: 2024-02-24 16:21:10
+ * @FilePath: /linear_regression/src/linear_regression.c
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置:
+ * https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+#include "linear_regression.h"
+
+#include &lt;cmath&gt;
+#include <&lt;iostream&gt;
+
+void linear_regression::train( )
+{
+    while ( w_diff( ) && b_diff( ) )
+    {
+        double temp_w    = w - alapa * w_diff( );
+        double temp_b    = b - alapa * b_diff( );
+        w                = temp_w;
+        b                = temp_b;
+        double temp_cost = cost( );
+        std::cout << "Current Cost: " << temp_cost << std::endl;
+        if ( std::isnan( temp_cost ) || std::isinf( temp_cost ) )
+        {
+            break;
+        }
+    }
+    std::cout << "Train Complete!" << std::endl;
+    std::cout << "Y = " << w << "* x + (" << b << ")" << std::endl;
+}
+
+double linear_regression::test( const double x )
+{
+    double y = f_w_b( x );
+    return y;
+}
+
+void linear_regression::test( )
+{
+    for ( std::size_t i = 0; i < m_test_set.size( ); i++ )
+    {
+        double x                       = std::get< 0 >( m_test_set[i] );
+        double y                       = f_w_b( x );
+        std::get< 2 >( m_test_set[i] ) = y;
+        std::cout << "Y(" << x << ") = " << y << std::endl;
+    }
+}
+
+double linear_regression::cost( )
+{
+    double sum = 0;
+    for ( std::size_t i = 0; i < m_train_set.size( ); i++ )
+    {
+        double x = std::get< 0 >( m_train_set[i] );
+        double y = std::get< 1 >( m_train_set[i] );
+        sum += std::pow( f_w_b( x ) - y, 2 );
+    }
+    return sum / ( 2 * m_train_set.size( ) );
+}
+
+double linear_regression::w_diff( )
+{
+    double sum = 0;
+    for ( std::size_t i = 0; i < m_train_set.size( ); i++ )
+    {
+        double x = std::get< 0 >( m_train_set[i] );
+        double y = std::get< 1 >( m_train_set[i] );
+        sum += ( f_w_b( x ) - y ) * x;
+    }
+    return sum / m_train_set.size( );
+}
+
+double linear_regression::b_diff( )
+{
+    double sum = 0;
+    for ( std::size_t i = 0; i < m_train_set.size( ); i++ )
+    {
+        double x = std::get< 0 >( m_train_set[i] );
+        double y = std::get< 1 >( m_train_set[i] );
+        sum += ( f_w_b( x ) - y );
+    }
+    return sum / m_train_set.size( );
+}
+    </code>
+</pre>
+</html>
