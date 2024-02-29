@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script
+            src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css">
+        <title>C语言程序设计第一章课后题</title>
+        <style>
+            @media (max-width: 767px) { body { padding: 15px; } }
+            body { box-sizing: border-box;
+                   min-width: 200px;
+                   max-width: 980px;
+                   margin: 0 auto;
+                   padding: 45px; }
+              </style>
+    </head>
+    <body>
+        <div id="$m" class="markdown-body"></div>
+        <textarea id="$t" style="display:none">
+# C程序设计第一章课后题
+
+## 重点问题
+
+**判断素数**  
+
+素数是大于1的自然数，除了1和自身外，其他数都不是它的因子。   
+[5种你不知道的素数的判断方法](https://zhuanlan.zhihu.com/p/104314640)  
+
+**最大公约数**  
+
+找一个最大并且可以除开给出的两个数的数。  
+[找两个数的最大公约数](https://www.runoob.com/cprogramming/c-examples-hcf-gcd.html)   
+
+**求解一元二次方程组**  
+
+[解一元二次方程组](https://www.runoob.com/cplusplus/cpp-examples-quadratic-roots.html)    
+![不同根](https://www.runoob.com/wp-content/uploads/2019/01/roots-quadratic-equation.jpg)    
+![相同的根](https://www.runoob.com/wp-content/uploads/2019/01/2EB35C63-5C64-45FF-80EE-B591BE244395.jpg)    
+
+## Solution
+
+1. 算法就是一个解决问题的有限序列，例如在生活中我们做饭要遵循一定的步骤，还有就是计算平均成绩，也是要先加和，然后再除个数，最后我们办理事务也是要有一定的程序。
+2. 结构化算法就是把一个大的功能的实现分割为许多个小功能的实现，因为可以将复杂问题简单化,让编程更容易,提高代码维护和可读性。
+3. 三种结构是顺序结构，循环结构，选择结构。顺序结构是执行到 A 时，紧接着就执行相邻的 B；选择结构就是判断条件，如果为真那么执行A，如果结果为假执行B；循环结构是反复执行一部分内的代码。
+   1. 基本结构1
+      ```mermaid
+      flowchart TD
+      	 id3[退出]
+       id2-->id1
+      id1[读取输入]-->|是|id2{是否大于1}-->|否|id3
+      ```
+   2. 基本结构2
+      ```mermaid
+      flowchart TD
+      id1[读取输入]-->id2{是否为int类型}-->|是|id3{是否大于10}-->|是|id4[退出]
+      id3-->|否|id1
+      ```
+4. 流程图：
+5. N-S 图：
+6. 伪代码
+	1. 问题2
+	```c
+	begin
+		cup1 => number;
+		cup2 => number;
+		cup3 => number;
+		cup2 = cup3;
+		cup3 = cup1;
+		cup1 = cup2;
+	end
+	```
+	2. 问题1
+	```c
+	begin
+		i => number;
+		i = 0;
+		max => number;
+		max = 0;
+		while(i < 10)
+		{
+			current => number;
+			current = read_in();
+			if (current >= max)
+			{
+				max = current;
+			}
+			i = i + 1;
+		}
+	end
+	```
+	3. 问题3
+	```c
+	begin
+		a => number;
+		b => number;
+		c => number;
+		if (a > b && a > c)
+		{
+			print(a);
+			if ( b > c )
+				print(b);
+				print(c);
+			else
+			{
+				print(c);
+				print(b)
+			}
+		}
+		else if(b > a && b > c)
+		{
+			print(b);
+			if(a > c)
+			{
+				print(a);
+				print(c);
+			}
+			else
+			{
+				print(c);
+				print(a);
+			}
+		}
+		else
+		{
+			print(c);
+			if(b > a)
+			{
+				print(b);
+				print(a);
+			}
+			else
+			{
+				print(a);
+				print(b);
+			}
+		}
+	end
+	```
+	4. 问题4
+	```c
+	begin
+		sum => number;
+		i => numberl
+		for( i = 0; i < 100; i++ )
+		{
+			sum += i;
+		}
+	end
+	```
+	5. 问题5
+	```c
+	begin
+		n => number;
+		if ( ( (n % 3) && (n % 5) ) == FALSE)
+		{
+			OK;
+		}
+		else
+		{
+			FALSE;
+		}
+		
+	end
+	```
+	6. 问题6
+	```c
+	begin
+		i => number;
+		for ( i = 100; i < 200; i++)
+		{
+			j => number;
+			for (j = 2; j < i; j++)
+			{
+				if ((i % j) == FALSE )
+				{
+					不是素数;
+					return;
+				}
+			}
+			是素数;
+			print(i);
+		}
+	end
+	```
+	7. 问题7
+	```c
+	begin
+		i => number;
+		n1 => number;
+		n2 => number;
+		for(i = 1; i < n2 && i < n2; i++)
+		{
+			if ( (n1 % i) && (n2 % i) )
+			{
+				找到了最大公约数。
+			}
+		}
+	end
+	```
+	8. 问题8
+	```c
+	begin
+		x1 => number;
+		x2 => number;
+		d = pow(b, 2) - 4 * a * c;
+		// 两个不等实根
+		if ( d > 0 )
+		{
+			x1 = (-b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
+			x1 = (-b + sqrt(pow(b, 2) + 4 * a * c)) / (2 * a);
+		}
+		// 有两个相等的实根
+		else if(!d)
+		{
+			x1 = x2 = b / (2 * a);
+		}
+		else
+		{
+			无解
+		}
+	end
+	```
+7. 问题7
+	结构化程序设计就是用计算机语言表示的结构化算法。   
+	主要内容有采用自顶向下、逐步求精及模块化的程序设计方法；使用三种基本控制结构构造程序，任何程序都可由顺序、选择、循环三种基本控制结构构造。    
+8. 问题8
+	1. 问题1
+	```c
+	#include <stdio.h>
+	
+	int main()
+	{
+		for(int i = 1900; i < 2001; i++)
+		{
+			if ( (!(i % 4) && (i % 100)) || ( !( i % 100 ) && !( i % 400 ) ) )
+				printf("这是闰年！");
+		}
+		return 0;
+	}
+	
+	```
+	2. 问题2
+	```c
+	#include <stdio.h>
+	#include <math.h>
+	
+	void solution( const double a, const double b, const double c, double* x1, double* x2)
+	{
+		if(!x1 || !x2) return;
+		double d = pow(b, 2) - 4 * a * c;
+		if( d  > 0 )
+		{
+			*x1 = ((-b) + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
+			*x2 = ((-b) + sqrt(pow(b, 2) + 4 * a * c)) / (2 * a);
+		}
+		else if(!d)
+		{
+			*x1 = *x2 = - ( b ) / ( 2 * a )
+		}
+		else
+		{
+			printf("Error!");
+		}
+	}
+	
+	int main()
+	{
+		double x1 = 0;
+		double x2 = 0;
+		
+		solution(1, 2, 3, &x1, &x2);
+		
+		printf("x1 = %f", x1);
+		printf("x2 = %f", x2);
+		
+		return 0;
+	}
+	```
+	3. 问题3
+	```c
+	#include <stdio.h>
+	
+	int solution( const int* arr, const unsigned int length)
+	{
+		int max = 0;
+		for( int i = 0; i < length; i++ )
+		{
+			if(arr[i] >= max )
+			{
+				max = arr[i];
+			}
+		}
+		return max;
+	}
+	
+	int main()
+	{
+		unsigned int length = 10;
+		int arr[10] = {1, 2,3, 4, 5, 6, 7, 8, 9, 0};
+		solution(arr, length);
+		return 0;
+	}
+	```
+
+        </textarea>
+    </body>
+    <script>$m.innerHTML = marked.parse($t.value);</script>
+</html>
