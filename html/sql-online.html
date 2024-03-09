@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQL-ONLINE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="./index.html">SQL ONLINE</a>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">SQL</span>
+                    </div>
+                    <textarea class="form-control" aria-label="With textarea" style="height: 300px"
+                        id="sql-area"></textarea>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <br>
+                    <button type="button" class="btn btn-success" id="submit"
+                        onclick="on_click_submit_btn()">Submit</button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop-clear" id="clear">Clear</button>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop-save" onclick="on_click_save_btn()">Save</button>
+                    <button class="btn btn-primary" type="button" id="history" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop-history" onclick="on_click_history_btn()">
+                        History
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <br>
+                    <b> Result: </b>
+                    <table class="table">
+                        <tbody id="table-area"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Clear -->
+        <div class="modal fade" id="staticBackdrop-clear" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Clear</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to clear the current content?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="on_click_clear_btn()"
+                            data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Save -->
+        <div class="modal fade" id="staticBackdrop-save" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Save</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Save successfully!
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal History -->
+        <div class="modal fade" id="staticBackdrop-history" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">History</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <b> History </b>
+                        <ul id="history-list" class="list-group"></ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/alasql@4"></script>
+<script>
+    var history_list = new Array();
+    var current_db = new alasql.Database();
+    // When the page loads, check if there is saved content and restore to the textarea
+    window.addEventListener('load', function () {
+        var savedContent = localStorage.getItem("savedContent");
+        if (savedContent) {
+            var textarea = document.getElementById("sql-area");
+            textarea.value = savedContent;
+        }
+    });
+
+    // save
+    function on_click_save_btn() {
+        var sql_area = document.getElementById("sql-area");
+        var content = sql_area.value;
+        // Use localStorage to save content to the browser
+        localStorage.setItem("savedContent", content);
+    }
+
+    // clear
+    function on_click_clear_btn() {
+        var sql_area = document.getElementById("sql-area");
+        sql_area.value = "";
+        localStorage.setItem("savedContent", "");
+    }
+
+    // submit
+    function on_click_submit_btn() {
+        var sql_area = document.getElementById("sql-area");
+        var content = sql_area.value;
+        history_list.push(content);
+        var res, err = alasql.promise(content)
+            .then(function (res) {
+                alert("Run ok!");
+                var tableBody = document.getElementById("table-area");
+                // show result
+                // col name
+                for (var i = 0; i < res.length; i++) {
+                    for (var j in res[i]) {
+                        var row = document.createElement("tr");
+                        if (j == 1) {
+                            // console.log(Object.keys(res[i][j]));
+                            var keys = Object.keys(res[i][j]);
+                            for (var key in keys) {
+                                var cell = document.createElement("td");
+                                cell.textContent = keys[key];
+                                row.appendChild(cell);
+                            }
+                            tableBody.appendChild(row);
+                        }
+                    }
+                }
+                // data
+                for (var i = 0; i < res.length; i++) {
+                    for (var j in res[i]) {
+                        var row = document.createElement("tr");
+                        for (var k in res[i][j]) {
+                            var cell = document.createElement("td");
+                            cell.textContent = res[i][j][k];
+                            console.log(res[i][j][k]);
+                            row.appendChild(cell);
+                        }
+                        tableBody.appendChild(row);
+                    }
+                }
+
+            }).catch(function (err) {
+                alert(err);
+            });
+    }
+    /*
+    CREATE TABLE one (two INT, three INT);
+    insert into one(two, three) values(2, 3);
+    select * from one;
+    */
+    // history
+    function on_click_history_btn() {
+        var list = document.getElementById("history-list");
+        list.innerHTML = "";
+
+        for (var i = 0; i < history_list.length; i++) {
+            var listItem = document.createElement("li");
+            listItem.className = "list-group-item";
+
+            listItem.textContent = history_list[i];
+            list.appendChild(listItem);
+
+            listItem.addEventListener("click", function () {
+                navigator.clipboard.writeText(listItem.textContent)
+                    .then(function () {
+                        alert("文本已复制到剪贴板");
+                    })
+                    .catch(function (error) {
+                        console.error("复制失败:", error);
+                    });
+            });
+        }
+        console.log(1);
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+
+</html>
