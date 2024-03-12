@@ -7,11 +7,14 @@
     <title>SQL-ONLINE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824595287792252"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="./index.html">SQL ONLINE</a>
+        <a class="navbar-brand" href="https://www.runoob.com/sql/sql-tutorial.html"> SQL 教程 </a>
     </nav>
     <div class="container">
         <div class="row">
@@ -22,6 +25,12 @@
                     </div>
                     <textarea class="form-control" aria-label="With textarea" style="height: 300px"
                         id="sql-area"></textarea>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop-example">
+                            Student Info and course Table
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -110,13 +119,71 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Example -->
+        <div class="modal fade" id="staticBackdrop-example" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Example</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="example-code"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="on_click_run_example()"
+                            data-bs-dismiss="modal">Run</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/alasql@4"></script>
 <script>
+    var example_obj = new Map;
+    example_obj.set("Student Info and course Table", {
+        code: "CREATE TABLE Student(Sno INT, Sname TEXT, Ssex CHAR(3), Sage INT, Sdept CHAR(3), PRIMARY KEY (Sno));\n  \
+    CREATE TABLE Course(Cno INT, Cname TEXT, Cpno INT, Ccredit INT, PRIMARY KEY (Cno) );\n \
+    CREATE TABLE SC(Sno INT, Cno INT, Grade INT) ;\n \
+    INSERT INTO  Student VALUES (201215121, '李勇', '男', 20, 'CS'); \n \
+    INSERT INTO  Student VALUES (201215122, '刘晨', '女', 19, 'CS'); \n \
+    INSERT INTO  Student VALUES (201215123, '王敏', '女', 18, 'MA'); \n \
+    INSERT INTO  Student VALUES (201215125, '张立', '男', 19, 'IS'); \n \
+    INSERT INTO  Course VALUES (1, '数据库', 5 , 4); \n \
+    INSERT INTO  Course VALUES (2, '数学', NULL , 2); \n \
+    INSERT INTO  Course VALUES (3, '信息系统', 1 , 4); \n \
+    INSERT INTO  Course VALUES (4, '操作系统', 6 , 3); \n \
+    INSERT INTO  Course VALUES (5, '数据结构', 7 , 4); \n \
+    INSERT INTO  Course VALUES (6, '数据处理', NULL , 2); \n \
+    INSERT INTO  Course VALUES (7, 'PASCAL语言', 6 , 4); \n \
+    INSERT INTO  SC VALUES(201215121, 1, 92); \n \
+    INSERT INTO  SC VALUES(201215121, 2, 85); \n \
+    INSERT INTO  SC VALUES(201215121, 3, 88); \n \
+    INSERT INTO  SC VALUES(201215122, 2, 90); \n \
+    INSERT INTO  SC VALUES(201215122, 3, 80); \n"
+    });
+
     var history_list = new Array();
+
     var current_db = new alasql.Database();
+
+    var links = document.getElementsByClassName("list-group-item list-group-item-action");
+    for (var i = 0; i < links.length; i++) {
+        var link = links[i];
+        link.addEventListener("click", function (event) {
+            event.preventDefault();
+            var text = this.innerText;
+            var example_area = document.getElementById("example-code");
+            example_area.textContent = example_obj.get(text).code;
+            console.log(text);
+        });
+    }
+
     // When the page loads, check if there is saved content and restore to the textarea
     window.addEventListener('load', function () {
         var savedContent = localStorage.getItem("savedContent");
@@ -146,51 +213,52 @@
         var sql_area = document.getElementById("sql-area");
         var content = sql_area.value;
         history_list.push(content);
-        var res, err = alasql.promise(content)
-            .then(function (res) {
-                alert("Run ok!");
-                var tableBody = document.getElementById("table-area");
-                // show result
-                // col name
-                for (var i = 0; i < res.length; i++) {
-                    for (var j in res[i]) {
-                        var row = document.createElement("tr");
-                        console.log(j);
-                        if (j == 0) {
-                            // console.log(Object.keys(res[i][j]));
-                            var keys = Object.keys(res[i][j]);
-                            for (var key in keys) {
+        var current = "";
+        for (var i = 0; i < content.length; i++) {
+            if (content[i] != ';') {
+                current += content[i];
+            }
+            else {
+                current += ';';
+                console.log(current);
+                var res, err = alasql.promise(current)
+                    .then(function (res) {
+                        alert("Run ok!");
+                        if (res instanceof Object) {
+                            console.log(res);
+                            var tableBody = document.getElementById("table-area");
+                            tableBody.innerHTML = "";
+                            // title
+                            var row = document.createElement("tr");
+                            var keys = Object.keys(res[0]);
+                            for (var i in keys) {
                                 var cell = document.createElement("td");
-                                cell.textContent = keys[key];
+                                cell.textContent = keys[i];
+                                console.log(keys[i]);
                                 row.appendChild(cell);
                             }
                             tableBody.appendChild(row);
-                        }
-                    }
-                }
-                // data
-                for (var i = 0; i < res.length; i++) {
-                    for (var j in res[i]) {
-                        var row = document.createElement("tr");
-                        for (var k in res[i][j]) {
-                            var cell = document.createElement("td");
-                            cell.textContent = res[i][j][k];
-                            console.log(res[i][j][k]);
-                            row.appendChild(cell);
-                        }
-                        tableBody.appendChild(row);
-                    }
-                }
 
-            }).catch(function (err) {
-                alert(err);
-            });
+                            // data
+                            for (var i = 0; i < res.length; i++) {
+                                var row = document.createElement("tr");
+                                for (var j in res[i]) {
+                                    var cell = document.createElement("td");
+                                    cell.textContent = res[i][j];
+                                    console.log(res[i][j]);
+                                    row.appendChild(cell);
+                                }
+                                tableBody.appendChild(row);
+                            }
+                        }
+                    }).catch(function (err) {
+                        alert(err);
+                    });
+                current = "";
+            }
+        }
     }
-    /*
-    CREATE TABLE one (two INT, three INT);
-    insert into one(two, three) values(2, 3);
-    select * from one;
-    */
+
     // history
     function on_click_history_btn() {
         var list = document.getElementById("history-list");
@@ -214,6 +282,31 @@
             });
         }
         console.log(1);
+    }
+
+    // copy example
+    function on_click_run_example() {
+        var example_area = document.getElementById("example-code");
+        var code = example_area.textContent;
+        console.log(code);
+        var current = "";
+        for (var i = 0; i < code.length; i++) {
+            if (code[i] != ';') {
+                current += code[i];
+            }
+            else {
+                current += ';';
+                console.log(current);
+                alasql.promise(current)
+                    .then(function (res) {
+                    }).catch(function (err) {
+                        alert(err);
+                        return;
+                    });
+                current = "";
+            }
+        }
+        alert("Init OK!");
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
