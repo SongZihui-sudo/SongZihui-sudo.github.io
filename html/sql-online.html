@@ -16,6 +16,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
 
     <script>hljs.highlightAll();</script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/material.css">
 </head>
 
 <body>
@@ -26,18 +30,12 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">SQL</span>
-                    </div>
-                    <textarea class="form-control" aria-label="With textarea" style="height: 300px"
-                        id="sql-area"></textarea>
-                    <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal"
-                            data-bs-target="#staticBackdrop-example">
-                            Student Info and course Table
-                        </a>
-                    </div>
+                <textarea style="height: 50%; width: 100%;" id="sql-area"></textarea>
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop-example">
+                        Student Info and course Table
+                    </a>
                 </div>
             </div>
 
@@ -148,10 +146,17 @@
             </div>
         </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/codemirror/mode/sql/sql.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/alasql@4"></script>
 <script>
+    var myEditor = CodeMirror.fromTextArea(document.getElementById("sql-area"), {
+        lineNumbers: true,
+        mode: "text/x-sql",
+        theme: "material"
+    });
+
     var example_obj = new Map;
     example_obj.set("Student Info and course Table", {
         code: "\
@@ -203,23 +208,20 @@
 
     // save
     function on_click_save_btn() {
-        var sql_area = document.getElementById("sql-area");
-        var content = sql_area.value;
+        var content = myEditor.getValue();
         // Use localStorage to save content to the browser
         localStorage.setItem("savedContent", content);
     }
 
     // clear
     function on_click_clear_btn() {
-        var sql_area = document.getElementById("sql-area");
-        sql_area.value = "";
+        sql_area.setValue("");
         localStorage.setItem("savedContent", "");
     }
 
     // submit
     function on_click_submit_btn() {
-        var sql_area = document.getElementById("sql-area");
-        var content = sql_area.value;
+        var content = myEditor.getValue();
         history_list.push(content);
         var current = "";
         for (var i = 0; i < content.length; i++) {
