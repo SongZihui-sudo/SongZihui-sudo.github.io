@@ -149,8 +149,17 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror/mode/sql/sql.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/alasql@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/sql.js/dist/sql-wasm.js"></script>
 <script>
+    // When the page loads, check if there is saved content and restore to the textarea
+    window.addEventListener('load', function () {
+        var savedContent = localStorage.getItem("savedContent");
+        if (savedContent) {
+            var textarea = document.getElementById("sql-area");
+            textarea.value = savedContent;
+        }
+    });
+
     var myEditor = CodeMirror.fromTextArea(document.getElementById("sql-area"), {
         lineNumbers: true,
         mode: "text/x-sql",
@@ -183,7 +192,14 @@
 
     var history_list = new Array();
 
-    var current_db = new alasql.Database();
+    let config = {
+        locateFile: () => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.wasm",
+    };
+    var current_db;
+    initSqlJs(config).then(function (SQL) {
+        console.log("sql.js initialized 🎉");
+        current_db = new SQL.Database()
+    });
 
     var links = document.getElementsByClassName("list-group-item list-group-item-action");
     for (var i = 0; i < links.length; i++) {
@@ -196,15 +212,6 @@
             console.log(text);
         });
     }
-
-    // When the page loads, check if there is saved content and restore to the textarea
-    window.addEventListener('load', function () {
-        var savedContent = localStorage.getItem("savedContent");
-        if (savedContent) {
-            var textarea = document.getElementById("sql-area");
-            textarea.value = savedContent;
-        }
-    });
 
     // save
     function on_click_save_btn() {
@@ -221,6 +228,8 @@
 
     // submit
     function on_click_submit_btn() {
+        var tableBody = document.getElementById("table-area");
+        tableBody.innerHTML = "";
         var content = myEditor.getValue();
         history_list.push(content);
         var current = "";
@@ -230,41 +239,41 @@
             }
             else {
                 current += ';';
-                console.log(current);
-                var res, err = alasql.promise(current)
-                    .then(function (res) {
-                        alert("Run ok!");
-                        if (res instanceof Object) {
-                            console.log(res);
-                            var tableBody = document.getElementById("table-area");
-                            tableBody.innerHTML = "";
-                            // title
-                            var row = document.createElement("tr");
-                            var keys = Object.keys(res[0]);
-                            for (var i in keys) {
-                                var cell = document.createElement("td");
-                                cell.textContent = keys[i];
-                                console.log(keys[i]);
-                                row.appendChild(cell);
-                            }
-                            tableBody.appendChild(row);
+                try {
+                    var results = current_db.exec(current);
+                    console.log(current);
+                    console.log(results);
+                    // title
+                    var row = document.createElement("tr");
+                    if (!results.length) {
+                        return;
+                    }
+                    var table_data = results[0];
 
-                            // data
-                            for (var i = 0; i < res.length; i++) {
-                                var row = document.createElement("tr");
-                                for (var j in res[i]) {
-                                    var cell = document.createElement("td");
-                                    cell.textContent = res[i][j];
-                                    console.log(res[i][j]);
-                                    row.appendChild(cell);
-                                }
-                                tableBody.appendChild(row);
-                            }
+                    for (var j = 0; j < table_data.columns.length; j++) {
+                        var cell = document.createElement("td");
+                        cell.textContent = table_data.columns[j];
+                        console.log(table_data.columns[j]);
+                        row.appendChild(cell);
+                    }
+                    tableBody.appendChild(row);
+                    // data
+                    for (var j = 0; j < table_data.values.length; j++) {
+                        var row = document.createElement("tr");
+                        for (var k = 0; k < table_data.values[j].length; k++) {
+                            var cell = document.createElement("td");
+                            cell.textContent = table_data.values[j][k];
+                            console.log(table_data.values[j][k]);
+                            row.appendChild(cell);
                         }
-                    }).catch(function (err) {
-                        alert(err);
-                    });
-                current = "";
+                        tableBody.appendChild(row);
+                    }
+                    current = "";
+                }
+                catch (error) {
+                    alert("Error executing SQL query:\n" + error.message);
+                    console.error(error.stack);
+                }
             }
         }
     }
@@ -278,18 +287,8 @@
             var listItem = document.createElement("li");
             listItem.className = "list-group-item";
 
-            listItem.textContent = history_list[i];
+            listItem.innerText = history_list[i];
             list.appendChild(listItem);
-
-            listItem.addEventListener("click", function () {
-                navigator.clipboard.writeText(listItem.textContent)
-                    .then(function () {
-                        alert("文本已复制到剪贴板");
-                    })
-                    .catch(function (error) {
-                        console.error("复制失败:", error);
-                    });
-            });
         }
         console.log(1);
     }
@@ -307,12 +306,12 @@
             else {
                 current += ';';
                 console.log(current);
-                alasql.promise(current)
-                    .then(function (res) {
-                    }).catch(function (err) {
-                        alert(err);
-                        return;
-                    });
+                try {
+                    var results = current_db.exec(current);
+                    var result_str = JSON.stringify(results, null, 2);
+                } catch (error) {
+                    alert("Error executing SQL query:\n" + error.message);
+                }
                 current = "";
             }
         }
