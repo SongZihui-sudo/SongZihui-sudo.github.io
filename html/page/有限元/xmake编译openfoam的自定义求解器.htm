@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xmake编译openfoam的自定义求解器</title>
+    <script type="text/javascript" src="/path/to/highlight.min.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="/path/to/highlightjs-luau/dist/luau.min.js"></script>
+</head>
+
+<body>
+    <h1> xmake编译openfoam的自定义求解器 </h1>
+    <p> 关于 openfoam 自定义求解器的编译主要是使用
+    <pre> wmake </pre> 来进行编译。 </p>
+    <p>它主要通过一个 files 文件还有一个 options 文件来进行配置。在 files 里配置源文件和输出的可执行文件目录，在 options 文件里主要进行配置头文件目录和要连接使用到的库目录。在执行了 <pre> wmake </pre> 命令后就可以看到一个调用了 g++ 的命令行包括了很多参数，为了可以更方便的编译，在这里就可以配置xmake.lua文件来使用<pre>xmake</pre>来进行编译。</p>
+    <p> 所以只需要配置好头文件目录和库目录那么就可以使用 xmake 来编译。 </p>
+    <p>使用 xmake 编译 openfoam 自定义求解器的一个示例为：</p>
+    <b> Example: </b>
+    <pre>
+        <code class="language-lua">
+            add_rules("mode.debug", "mode.release")
+            
+            add_includedirs("/usr/lib/openfoam/openfoam2312/src/finiteVolume/lnInclude")
+            add_includedirs("/usr/lib/openfoam/openfoam2312/src/meshTools/lnInclude")
+            add_includedirs("/usr/lib/openfoam/openfoam2312/src/OpenFOAM/lnInclude")
+            add_includedirs("/usr/lib/openfoam/openfoam2312/src/OSspecific/POSIX/lnInclude")
+            
+            target("helloworld")
+            add_cxflags("-DOPENFOAM=2312 -DWM_DP -DWM_LABEL_SIZE=32 -DNoRepository -g")
+            add_files("./helloWorld.cpp")
+            add_linkdirs("/usr/lib/openfoam/openfoam2312/platforms/linux64GccDPInt32Opt/lib")
+            add_links("meshTools")
+            add_links("finiteVolume")
+            add_links("OpenFOAM")
+            add_links("dl")
+            add_links("m")
+            target_end()openfoam2312:~/helloWorld/
+        </code>
+    </pre>
+    <p> 也是可以正常调试的 </p>
+    <img src="https://github.com/SongZihui-sudo/picture-bed/assets/77034643/e9e3e491-10d0-4f9a-a275-957637891b50">
+    <p> 运行结果 </p>
+    <img src="https://github.com/SongZihui-sudo/picture-bed/assets/77034643/8c0a3378-4a81-4d67-beaf-3acc4f2de17c">
+</body>
+    <script type="text/javascript">
+        hljs.registerLanguage('lua', hljsDefineLuau);
+        hljs.highlightAll();
+    </script>
+</html>
