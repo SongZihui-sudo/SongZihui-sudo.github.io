@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>逻辑回归</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <h1> 逻辑回归 </h1>
+    <h2> sigmoid函数 </h2>
+    <p> 
+        对于分类的任务，也可以使用线性模型来解决，简单的二分类问题，可以通过一条直线来对两种类别进行区分，所以就可以根据输入的特征来进行判别，概率大于0.5为1，小于0.5为0。这样就可以使用sigmoid函数来对其进行处理 
+        $$
+        sigmoid(x) = \frac{1}{1 + e^{-z}} \tag{1-1} \label{eq1}
+        $$
+        这部分可以看为线性回归：
+        $$
+        z = w^Tx+b \tag{1-2} \label {eq2}
+        $$
+    </p>
+    <h2> 代价函数 </h2>
+    <p>
+        使用极大似然估计可以得到其<b>代价函数</b>。<br>
+        <h3>极大似然估计</h2>
+        <p> 似然函数是是给定联合样本值下关于(未知)参数的函数，而我们目的就是要找误差最小时的参数，这样就可以借助似然函数来寻找（w,b）。 </p>
+        <p>
+            似然函数可以表示为：$$L(\theta| x) = f(x|\theta) \tag{2-1} \label{eq3} $$
+            极大似然估计 $$L(\theta) = \prod_{i=1}^{n}p(x_i;\theta) \tag{2-2} \label{eq4}$$
+            在二分类问题中，主要的类别就是0和1时，这样可以将其写为：
+            $$
+            L(w)=\prod[p(x_i)]^y_i[1-p(x_i)]^{1-y_i}\tag{2-3} \label{eq5}
+            $$
+            对似然函数取对数可得：
+            $$
+            L(w) = \sum[y_ilnp(x_i)+(1-y_i)ln(1-p(x_i))] \tag{2-4} \label{eq6}
+            $$
+        </p>
+        <h3>代价函数</h2>
+        <p>
+            由上式 $(2-4)$, 取平均对数似然损失，可得代价函数为：
+            $$
+                J(w) = -\frac{1}{N}lnL(W) \tag{3-1} \label{eq7}
+            $$
+        </p>
+    </p>
+    <h2> 代码实现 </h2>
+    <p>
+        <pre><code class="language-python">
+            import torch
+            import torch.autograd
+            import pandas as pd
+            import matplotlib.pyplot as plt
+            import numpy as np
+            from sklearn.model_selection import train_test_split
+            from sklearn import preprocessing
+
+            data_set = pd.read_csv("ionosphere_data_kaggle.csv")
+
+            data_set.describe
+
+            x = data_set.loc[:, "feature1": "feature34" ]
+            y = data_set.loc[:, "label"]
+            
+            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25)
+            x_train = x_train.astype('float')
+            x_test = x_test.astype('float')
+            
+            # 编码
+            enc=preprocessing.LabelEncoder() #获取一个LabelEncoder
+            enc=enc.fit(["g", "b"]) #训练LabelEncoder
+            y_train = enc.transform(y_train)
+            y_test = enc.transform(y_test)
+            
+            y_train = y_train.astype('float')
+            y_test = y_test.astype('float')
+            
+            # 将 pandas.DataFrame 转为 torch.tensor
+            x_train = torch.tensor(x_train.values, requires_grad=True)
+            y_train = torch.tensor(y_train, requires_grad=True)
+            y_test = torch.tensor(y_test, requires_grad=True)
+            x_test = torch.tensor(x_test.values, requires_grad=True)
+
+            def sigmoid(w, b, x):
+                res = 1 / (1 + torch.exp(-(torch.matmul(x, w) + b)))
+            return res
+            
+            def J_func(y_train, y_hat):
+                return y_train * torch.log(y_hat) + (1 - y_train) * torch.log(1 - y_hat)
+
+            l_rate = 0.01
+            n = torch.tensor([float(x_train.size()[0])], requires_grad=True)
+            w = torch.tensor(np.ones(x_train.size()[1]), requires_grad=True)
+            b = torch.tensor([1.0], requires_grad=True)
+            
+            for i in range(0, 5000):
+                J = J_func(y_train, sigmoid(w, b, x_train))
+                J = - J.sum() / n
+                J.backward()
+                with torch.no_grad():
+                    w.data = w.data - l_rate * (w.grad.data )
+                    b.data = b.data - l_rate * (b.grad.data )
+                    print("第 %d 次 w = " % (i))
+                    print(w.data)
+                    print("b = ")
+                    print(b.data)
+                    w.grad.zero_()
+                    b.grad.zero_()
+
+            y_hat = np.zeros(int(x_test.size()[0]))
+            
+            for i in range(int(x_test.size()[0])):
+                y_hat[i] = sigmoid(w, b, x_test[i])
+                if(y_hat[i] > 0.5):
+                    y_hat[i] = 1
+                else:
+                    y_hat[i] = 0
+            
+            x_cur = np.array(range(0, x_test.size()[0]))
+            y_test = y_test.detach().numpy()
+            plt.scatter(x_cur, y_test, c='r')
+            plt.scatter(x_cur, y_hat, c = "b")
+            plt.show()
+        </code></pre>
+    </p>
+    <p>
+        <img src="https://github.com/SongZihui-sudo/picture-bed/assets/77034643/7145ddcb-443d-4ecb-97da-68d5683212e6">
+    </p>
+    <h2>
+        引用
+    </h2>
+    <p> 
+    [1]周志华. 机器学习[M]. 北京: 清华大学出版社, 2016. <br>
+    [2]【机器学习】逻辑回归（非常详细）[EB/OL]//知乎专栏.https://zhuanlan.zhihu.com/p/74874291. <br>
+    [3]3. 线性神经网络 — 动手学深度学习 2.0.0 documentation[EB].https://zh-v2.d2l.ai/chapter_linear-networks/index.html.
+ </p>
+    <p>  </p>
+</body>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      extensions: ["tex2jax.js"],
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+      },
+      "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</html>
