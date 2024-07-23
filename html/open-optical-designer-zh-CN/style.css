@@ -1,0 +1,265 @@
+:root {
+    --window-bg-color: rgb(173, 213, 216);
+    --window-bg-secondary-color: rgb(121, 228, 255);
+    --table-bg-color: white;
+    --cross-section-viewport-bg-color: rgb(255, 255, 255);
+}
+
+body {
+    background-color: white;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+
+:not(input[type="text"]) {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input[type="text"] {
+    cursor: text;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+html, body, #app-container {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    height: 100%;
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    background-color: red; /*dbg*/
+    min-height: 0;
+}
+
+#app-main-row {
+    display: flex;
+    flex: 1;
+    background-color: yellow; /*dbg*/
+    min-height: 0;
+}
+
+#app-top-pane {
+    background-color: var(--window-bg-secondary-color);
+    height: 4em;
+}
+
+#app-left-pane {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--window-bg-color);
+    border-right: 4px solid var(--window-bg-secondary-color);
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#app-center-pane {
+    background-color: pink; /*dbg*/
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#main-canvas-container {
+    flex: 1;
+}
+
+.section {
+    margin: 0.5em;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+#surface-table-section-title {
+    margin-bottom: 0.2em;
+    display: flex;
+    align-items: center;
+}
+
+.surface-table-formula-input {
+    font-family: monospace;
+}
+
+table.edit-table {
+    border-collapse: collapse;
+    background-color: var(--table-bg-color);
+    border-radius: 3px;
+    width: 1em;
+}
+
+.edit-table th {
+    letter-spacing: 0.5px;
+}
+
+.edit-table thead th {
+    padding: 0.5em;
+}
+
+.edit-table tr {
+    border-bottom: 1px solid var(--window-bg-color);
+}
+
+.edit-table tbody td {
+    text-align: center;
+    padding: 0.5em;
+}
+
+.edit-table#surface-table td:first-child, .edit-table#surface-table th:first-child {
+    border-right: 1px solid var(--window-bg-color);
+    font-family: bold;
+}
+
+.edit-table-cell {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+.edit-table input[type="text"] {
+    border: none;
+    text-align: center;
+    font-size: inherit;
+    width: 100%;
+}
+
+#main-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+#surface-detail-table {
+    width: inherit;
+}
+
+#surface-detail-table input[type="text"] {
+    width: 4em;
+}
+
+#surface-table-controls {
+    display: flex;
+}
+
+.surface-table-controls-button {
+    width: 1.75em;
+    height: 1.75em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--table-bg-color);
+    margin-bottom: 0.2em;
+    border-radius: 3px;
+    margin-right: 0.2em;
+}
+
+.surface-table-controls-button:last-child {
+    margin-right: 0px;
+}
+
+.surface-table-controls-button-add:hover {
+    background-color: palegreen;
+}
+.surface-table-controls-button-remove:hover {
+    background-color: palevioletred;
+}
+
+.flex-expand {
+    flex: 1;
+}
+
+#env-control-table {
+    width: inherit;
+}
+
+#env-control-table input[type="text"] {
+    width: 4em;
+}
+
+#env-control-table td {
+    text-align: left;
+}
+
+.section-separator {
+    border: 2px solid var(--window-bg-secondary-color);
+    width: 100%;
+}
+
+#center-pane-control-bar {
+    background-color: var(--cross-section-viewport-bg-color);
+    padding: 0.2em;
+    display: flex;
+}
+
+.top-pane-button {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-right: 1em;
+    padding: 0.3em;
+    background-color: var(--table-bg-color);
+    border-radius: 3px;
+}
+
+.top-pane-button:hover {
+    background-color: var(--window-bg-color);
+}
+
+#top-pane-title {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    margin-left: 1em;
+    padding: 0.3em;
+    font-size: 150%;
+}
+
+#top-pane-title a {
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --window-bg-color: #222222;
+        --window-bg-secondary-color: #333333;
+        --table-bg-color: var(--window-bg-secondary-color);
+        --dark-mode-default-white: #EEEEEE;
+        --cross-section-viewport-bg-color: midnightblue;
+
+        color: var(--dark-mode-default-white);
+    }
+
+    input[type="text"], select {
+        background-color: var(--table-bg-color);
+        color: var(--dark-mode-default-white);
+        border: none;
+    }
+
+    select {
+        -webkit-appearance: none;
+    }
+
+    .surface-table-controls-button-add:hover {
+        background-color: darkgreen;
+    }
+    .surface-table-controls-button-remove:hover {
+        background-color: darkred;
+    }
+
+    .top-pane-button {
+        background-color: var(--window-bg-color);
+    }
+
+    #top-pane-title a {
+        color: white;
+    }
+
+    .top-pane-button:hover {
+        background-color: black;
+    }
+}
