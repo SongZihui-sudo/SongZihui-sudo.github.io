@@ -171,11 +171,10 @@
 <script>
     function changeFrameHeight() {
         var ifm = document.getElementById("page");
-        ifm.height = document.documentElement.clientHeight * 0.8;
+        ifm.height = document.documentElement.clientHeight * 0.9;
         var main_window = document.getElementById("main_window");
         main_window.height = document.documentElement.clientHeight;
     }
-    changeFrameHeight();
     window.onresize = function () {
         changeFrameHeight();
     }
