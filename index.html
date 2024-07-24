@@ -168,13 +168,14 @@
 <script>
     function changeFrameHeight() {
         var ifm = document.getElementById("page");
-        ifm.height = document.documentElement.clientHeight * 0.9;
+        ifm.height = document.documentElement.clientHeight*0.8;
         var main_window = document.getElementById("main_window");
         main_window.height = document.documentElement.clientHeight;
     }
     window.onresize = function () {
         changeFrameHeight();
     }
+    changeFrameHeight()
     const gitalk = new Gitalk({
         clientID: 'GitHub Application Client ID',
         clientSecret: 'GitHub Application Client Secret',
