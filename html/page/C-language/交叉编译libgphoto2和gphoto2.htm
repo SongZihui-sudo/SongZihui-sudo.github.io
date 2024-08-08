@@ -4,17 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>交叉编译libgphoto2和gphoto2</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+	
 	<!-- and it's easy to individually load additional languages -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/go.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+	
+	<script>hljs.highlightAll();</script>
 </head>
 <body>
     <h1> 交叉编译libgphoto2和gphoto2 </h1>
     <p> libgphoto2（https://github.com/gphoto/libgphoto2） 库是一个支持通过PTP，MTP 协议与数码相机进行交互的库。gphoto2 则是一个基于 libgphoto2 的命令行程序。下面通过使用 luckfox sdk 中的交叉编译工具链来交叉编译，把 libgphoto2 移植到 gphoto2 </p>
     <h2> 设备树修改 </h1>
 	<pre>
-    	<code>
+    	<code class="language-c">
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright (c) 2023 Luckfox Electronics Co., Ltd.
@@ -119,8 +122,646 @@
 
     </code>
 </pre>
+<p> 主要是配置了usb，i2c, uart4。设置了usb模式为host，开启了 i2c 接口便于后面连接屏幕，开始 uart4 方便连接串口模块。 </p>
+<h2> 编译 ligphoto2 </h2>
+<p> 主要的依赖有 libtool, libsub, libexif, libxml2。 </p>
+<h3> 编译 libtool </h3>
+<pre>
+	<code>
+./configure --prefix=/ --host=arm-rockchip830-linux-uclibcgnueabihf  --with-pic CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<pre>
+	<code>
+make
+make install DESTDIR=/home/song/arm_libgphoto2/arm_install_libtool
+	</code>
+</pre>
+<h3> 编译 libusb </h3>
+<pre>
+	<code>
+./configure --prefix=/ --host=arm-rockchip830-linux-uclibcgnueabihf  --with-pic --disable-udev CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<pre>
+	<code>
+make
+make install DESTDIR=/home/song/arm_libgphoto2/arm_install_libtool
+	</code>
+</pre>
+<h3> 编译 libusb-compat-0.1.8 </h3>
+<pre>
+	<code>
+./configure --prefix=/home/song/arm_libgphoto2/arm_install_libusb-compat-0.1.8 --host=arm-rockchip830-linux-uclibcgnueabihf LIBUSB_1_0_CFLAGS=-I/home/song/arm_libgphoto2/arm_install_libusb/include/libusb-1.0 PKG_CONFIG_PATH=/home/song/arm_libgphoto2/arm_install_libusb/lib/pkgconfig
+make
+make install
+	</code>
+</pre>
+<h3> 编译 libexif </h3>
+<pre>
+	<code>
+./configure --prefix=/ --host=arm-rockchip830-linux-uclibcgnueabihf  --with-pic CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<pre>
+	<code>
+make
+make install DESTDIR=/home/song/arm_libgphoto2/arm_install_libexif
+	</code>
+</pre>
+<h3> 编译 libxml2 </h3>
+<h4> 编译 libiconv </h4>
+<pre>
+	<code>
+./configure --prefix=/ --host=arm-rockchip830-linux-uclibcgnueabihf CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<pre>
+	<code>
+make 
+make install DESTDIR=/home/song/arm_libgphoto2/arm_install_libiconv
+	</code>
+</pre>
+<h4> 编译 zlib-1.2.11 </h4>
+<pre>
+	<code>
+./configure --prefix=/ CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<p> 修改 Makefile 文件 </p>
+<pre>
+	<code>
+# Makefile for zlib
+# Copyright (C) 1995-2024 Jean-loup Gailly, Mark Adler
+# For conditions of distribution and use, see copyright notice in zlib.h
+
+# To compile and test, type:
+#    ./configure; make test
+# Normally configure builds both a static and a shared library.
+# If you want to build just a static library, use: ./configure --static
+
+# To install /usr/local/lib/libz.* and /usr/local/include/zlib.h, type:
+#    make install
+# To install in $HOME instead of /usr/local, use:
+#    make install prefix=$HOME
+
+CC=arm-rockchip830-linux-uclibcgnueabihf-gcc
+
+CFLAGS=-O3 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+#CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
+#CFLAGS=-g -DZLIB_DEBUG
+#CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
+#           -Wstrict-prototypes -Wmissing-prototypes
+
+SFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+LDFLAGS=
+TEST_LIBS=-L. libz.a
+LDSHARED=arm-rockchip830-linux-uclibcgnueabihf-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+CPP=
+
+STATICLIB=libz.a
+SHAREDLIB=libz.so
+SHAREDLIBV=libz.so.1.3.1
+SHAREDLIBM=libz.so.1
+LIBS=$(STATICLIB) $(SHAREDLIBV)
+
+AR=arm-rockchip830-linux-uclibcgnueabihf-ar
+ARFLAGS=rc
+RANLIB=ranlib
+LDCONFIG=ldconfig
+LDSHAREDLIBC=-lc
+TAR=tar
+SHELL=/bin/sh
+EXE=
+
+prefix =/
+exec_prefix =${prefix}
+libdir =${exec_prefix}/lib
+sharedlibdir =${libdir}
+includedir =${prefix}/include
+mandir =${prefix}/share/man
+man3dir = ${mandir}/man3
+pkgconfigdir = ${libdir}/pkgconfig
+SRCDIR=
+ZINC=
+ZINCOUT=-I.
+
+OBJZ = adler32.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o zutil.o
+OBJG = compress.o uncompr.o gzclose.o gzlib.o gzread.o gzwrite.o
+OBJC = $(OBJZ) $(OBJG)
+
+PIC_OBJZ = adler32.lo crc32.lo deflate.lo infback.lo inffast.lo inflate.lo inftrees.lo trees.lo zutil.lo
+PIC_OBJG = compress.lo uncompr.lo gzclose.lo gzlib.lo gzread.lo gzwrite.lo
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+
+# to use the asm code: make OBJA=match.o, PIC_OBJA=match.lo
+OBJA =
+PIC_OBJA =
+
+OBJS = $(OBJC) $(OBJA)
+
+PIC_OBJS = $(PIC_OBJC) $(PIC_OBJA)
+
+all: static shared all64
+
+static: example$(EXE) minigzip$(EXE)
+
+shared: examplesh$(EXE) minigzipsh$(EXE)
+
+all64: example64$(EXE) minigzip64$(EXE)
+
+check: test
+
+test: all teststatic testshared test64
+
+teststatic: static
+        @TMPST=tmpst_$$; \
+        if echo hello world | ${QEMU_RUN} ./minigzip | ${QEMU_RUN} ./minigzip -d && ${QEMU_RUN} ./example $$TMPST ; then \
+          echo '                *** zlib test OK ***'; \
+        else \
+          echo '                *** zlib test FAILED ***'; false; \
+        fi
+        @rm -f tmpst_$$
+
+testshared: shared
+        @LD_LIBRARY_PATH=`pwd`:$(LD_LIBRARY_PATH) ; export LD_LIBRARY_PATH; \
+        LD_LIBRARYN32_PATH=`pwd`:$(LD_LIBRARYN32_PATH) ; export LD_LIBRARYN32_PATH; \
+        DYLD_LIBRARY_PATH=`pwd`:$(DYLD_LIBRARY_PATH) ; export DYLD_LIBRARY_PATH; \
+        SHLIB_PATH=`pwd`:$(SHLIB_PATH) ; export SHLIB_PATH; \
+        TMPSH=tmpsh_$$; \
+        if echo hello world | ${QEMU_RUN} ./minigzipsh | ${QEMU_RUN} ./minigzipsh -d && ${QEMU_RUN} ./examplesh $$TMPSH; then \
+          echo '                *** zlib shared test OK ***'; \
+        else \
+          echo '                *** zlib shared test FAILED ***'; false; \
+        fi
+        @rm -f tmpsh_$$
+
+test64: all64
+        @TMP64=tmp64_$$; \
+        if echo hello world | ${QEMU_RUN} ./minigzip64 | ${QEMU_RUN} ./minigzip64 -d && ${QEMU_RUN} ./example64 $$TMP64; then \
+          echo '                *** zlib 64-bit test OK ***'; \
+        else \
+          echo '                *** zlib 64-bit test FAILED ***'; false; \
+        fi
+        @rm -f tmp64_$$
+
+infcover.o: $(SRCDIR)test/infcover.c $(SRCDIR)zlib.h zconf.h
+        $(CC) $(CFLAGS) $(ZINCOUT) -c -o $@ $(SRCDIR)test/infcover.c
+
+infcover: infcover.o libz.a
+        $(CC) $(CFLAGS) -o $@ infcover.o libz.a
+
+cover: infcover
+        rm -f *.gcda
+        ${QEMU_RUN} ./infcover
+        gcov inf*.c
+
+libz.a: $(OBJS)
+        $(AR) $(ARFLAGS) $@ $(OBJS)
+        -@ ($(RANLIB) $@ || true) >/dev/null 2>&1
+
+match.o: match.S
+        $(CPP) match.S > _match.s
+        $(CC) -c _match.s
+        mv _match.o match.o
+        rm -f _match.s
+
+match.lo: match.S
+        $(CPP) match.S > _match.s
+        $(CC) -c -fPIC _match.s
+        mv _match.o match.lo
+        rm -f _match.s
+
+example.o: $(SRCDIR)test/example.c $(SRCDIR)zlib.h zconf.h
+        $(CC) $(CFLAGS) $(ZINCOUT) -c -o $@ $(SRCDIR)test/example.c
+
+minigzip.o: $(SRCDIR)test/minigzip.c $(SRCDIR)zlib.h zconf.h
+        $(CC) $(CFLAGS) $(ZINCOUT) -c -o $@ $(SRCDIR)test/minigzip.c
+
+example64.o: $(SRCDIR)test/example.c $(SRCDIR)zlib.h zconf.h
+        $(CC) $(CFLAGS) $(ZINCOUT) -D_FILE_OFFSET_BITS=64 -c -o $@ $(SRCDIR)test/example.c
+
+minigzip64.o: $(SRCDIR)test/minigzip.c $(SRCDIR)zlib.h zconf.h
+        $(CC) $(CFLAGS) $(ZINCOUT) -D_FILE_OFFSET_BITS=64 -c -o $@ $(SRCDIR)test/minigzip.c
+
+
+adler32.o: $(SRCDIR)adler32.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)adler32.c
+
+crc32.o: $(SRCDIR)crc32.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)crc32.c
+
+deflate.o: $(SRCDIR)deflate.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)deflate.c
+
+infback.o: $(SRCDIR)infback.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)infback.c
+
+inffast.o: $(SRCDIR)inffast.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)inffast.c
+
+inflate.o: $(SRCDIR)inflate.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)inflate.c
+
+inftrees.o: $(SRCDIR)inftrees.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)inftrees.c
+
+trees.o: $(SRCDIR)trees.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)trees.c
+
+zutil.o: $(SRCDIR)zutil.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)zutil.c
+
+compress.o: $(SRCDIR)compress.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)compress.c
+
+uncompr.o: $(SRCDIR)uncompr.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)uncompr.c
+
+gzclose.o: $(SRCDIR)gzclose.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)gzclose.c
+
+gzlib.o: $(SRCDIR)gzlib.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)gzlib.c
+
+gzread.o: $(SRCDIR)gzread.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)gzread.c
+
+gzwrite.o: $(SRCDIR)gzwrite.c
+        $(CC) $(CFLAGS) $(ZINC) -c -o $@ $(SRCDIR)gzwrite.c
+
+
+adler32.lo: $(SRCDIR)adler32.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/adler32.o $(SRCDIR)adler32.c
+        -@mv objs/adler32.o $@
+
+crc32.lo: $(SRCDIR)crc32.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/crc32.o $(SRCDIR)crc32.c
+        -@mv objs/crc32.o $@
+
+deflate.lo: $(SRCDIR)deflate.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/deflate.o $(SRCDIR)deflate.c
+        -@mv objs/deflate.o $@
+
+infback.lo: $(SRCDIR)infback.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/infback.o $(SRCDIR)infback.c
+        -@mv objs/infback.o $@
+
+inffast.lo: $(SRCDIR)inffast.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/inffast.o $(SRCDIR)inffast.c
+        -@mv objs/inffast.o $@
+
+inflate.lo: $(SRCDIR)inflate.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/inflate.o $(SRCDIR)inflate.c
+        -@mv objs/inflate.o $@
+
+inftrees.lo: $(SRCDIR)inftrees.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/inftrees.o $(SRCDIR)inftrees.c
+        -@mv objs/inftrees.o $@
+
+trees.lo: $(SRCDIR)trees.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/trees.o $(SRCDIR)trees.c
+        -@mv objs/trees.o $@
+
+zutil.lo: $(SRCDIR)zutil.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/zutil.o $(SRCDIR)zutil.c
+        -@mv objs/zutil.o $@
+
+compress.lo: $(SRCDIR)compress.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/compress.o $(SRCDIR)compress.c
+        -@mv objs/compress.o $@
+
+uncompr.lo: $(SRCDIR)uncompr.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/uncompr.o $(SRCDIR)uncompr.c
+        -@mv objs/uncompr.o $@
+
+gzclose.lo: $(SRCDIR)gzclose.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/gzclose.o $(SRCDIR)gzclose.c
+        -@mv objs/gzclose.o $@
+
+gzlib.lo: $(SRCDIR)gzlib.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/gzlib.o $(SRCDIR)gzlib.c
+        -@mv objs/gzlib.o $@
+
+gzread.lo: $(SRCDIR)gzread.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/gzread.o $(SRCDIR)gzread.c
+        -@mv objs/gzread.o $@
+
+gzwrite.lo: $(SRCDIR)gzwrite.c
+        -@mkdir objs 2>/dev/null || test -d objs
+        $(CC) $(SFLAGS) $(ZINC) -DPIC -c -o objs/gzwrite.o $(SRCDIR)gzwrite.c
+        -@mv objs/gzwrite.o $@
+
+
+placebo $(SHAREDLIBV): $(PIC_OBJS) libz.a
+        $(LDSHARED) $(SFLAGS) -o $@ $(PIC_OBJS) $(LDSHAREDLIBC) $(LDFLAGS)
+        rm -f $(SHAREDLIB) $(SHAREDLIBM)
+        ln -s $@ $(SHAREDLIB)
+        ln -s $@ $(SHAREDLIBM)
+        -@rmdir objs
+
+example$(EXE): example.o $(STATICLIB)
+        $(CC) $(CFLAGS) $(LDFLAGS) -o $@ example.o $(TEST_LIBS)
+
+minigzip$(EXE): minigzip.o $(STATICLIB)
+        $(CC) $(CFLAGS) $(LDFLAGS) -o $@ minigzip.o $(TEST_LIBS)
+
+examplesh$(EXE): example.o $(SHAREDLIBV)
+        $(CC) $(CFLAGS) -o $@ example.o $(LDFLAGS) -L. $(SHAREDLIBV)
+
+minigzipsh$(EXE): minigzip.o $(SHAREDLIBV)
+        $(CC) $(CFLAGS) -o $@ minigzip.o $(LDFLAGS) -L. $(SHAREDLIBV)
+
+example64$(EXE): example64.o $(STATICLIB)
+        $(CC) $(CFLAGS) $(LDFLAGS) -o $@ example64.o $(TEST_LIBS)
+
+minigzip64$(EXE): minigzip64.o $(STATICLIB)
+        $(CC) $(CFLAGS) $(LDFLAGS) -o $@ minigzip64.o $(TEST_LIBS)
+
+install-libs: $(LIBS)
+        -@if [ ! -d $(DESTDIR)$(exec_prefix)  ]; then mkdir -p $(DESTDIR)$(exec_prefix); fi
+        -@if [ ! -d $(DESTDIR)$(libdir)       ]; then mkdir -p $(DESTDIR)$(libdir); fi
+        -@if [ ! -d $(DESTDIR)$(sharedlibdir) ]; then mkdir -p $(DESTDIR)$(sharedlibdir); fi
+        -@if [ ! -d $(DESTDIR)$(man3dir)      ]; then mkdir -p $(DESTDIR)$(man3dir); fi
+        -@if [ ! -d $(DESTDIR)$(pkgconfigdir) ]; then mkdir -p $(DESTDIR)$(pkgconfigdir); fi
+        rm -f $(DESTDIR)$(libdir)/$(STATICLIB)
+        cp $(STATICLIB) $(DESTDIR)$(libdir)
+        chmod 644 $(DESTDIR)$(libdir)/$(STATICLIB)
+        -@($(RANLIB) $(DESTDIR)$(libdir)/libz.a || true) >/dev/null 2>&1
+        -@if test -n "$(SHAREDLIBV)"; then \
+          rm -f $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBV); \
+          cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir); \
+          echo "cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)"; \
+          chmod 755 $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBV); \
+          echo "chmod 755 $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBV)"; \
+          rm -f $(DESTDIR)$(sharedlibdir)/$(SHAREDLIB) $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBM); \
+          ln -s $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)/$(SHAREDLIB); \
+          ln -s $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)/$(SHAREDLIBM); \
+          ($(LDCONFIG) || true)  >/dev/null 2>&1; \
+        fi
+        rm -f $(DESTDIR)$(man3dir)/zlib.3
+        cp $(SRCDIR)zlib.3 $(DESTDIR)$(man3dir)
+        chmod 644 $(DESTDIR)$(man3dir)/zlib.3
+        rm -f $(DESTDIR)$(pkgconfigdir)/zlib.pc
+        cp zlib.pc $(DESTDIR)$(pkgconfigdir)
+        chmod 644 $(DESTDIR)$(pkgconfigdir)/zlib.pc
+# The ranlib in install is needed on NeXTSTEP which checks file times
+# ldconfig is for Linux
+
+install: install-libs
+        -@if [ ! -d $(DESTDIR)$(includedir)   ]; then mkdir -p $(DESTDIR)$(includedir); fi
+        rm -f $(DESTDIR)$(includedir)/zlib.h $(DESTDIR)$(includedir)/zconf.h
+        cp $(SRCDIR)zlib.h zconf.h $(DESTDIR)$(includedir)
+        chmod 644 $(DESTDIR)$(includedir)/zlib.h $(DESTDIR)$(includedir)/zconf.h
+
+uninstall:
+        cd $(DESTDIR)$(includedir) && rm -f zlib.h zconf.h
+        cd $(DESTDIR)$(libdir) && rm -f libz.a; \
+        if test -n "$(SHAREDLIBV)" -a -f $(SHAREDLIBV); then \
+          rm -f $(SHAREDLIBV) $(SHAREDLIB) $(SHAREDLIBM); \
+        fi
+        cd $(DESTDIR)$(man3dir) && rm -f zlib.3
+        cd $(DESTDIR)$(pkgconfigdir) && rm -f zlib.pc
+
+docs: zlib.3.pdf
+
+zlib.3.pdf: $(SRCDIR)zlib.3
+        groff -mandoc -f H -T ps $(SRCDIR)zlib.3 | ps2pdf - $@
+
+zconf.h.cmakein: $(SRCDIR)zconf.h.in
+        -@ TEMPFILE=zconfh_$$; \
+        echo "/#define ZCONF_H/ a\\\\\n#cmakedefine Z_PREFIX\\\\\n#cmakedefine Z_HAVE_UNISTD_H\n" >> $$TEMPFILE &&\
+        sed -f $$TEMPFILE $(SRCDIR)zconf.h.in > $@ &&\
+        touch -r $(SRCDIR)zconf.h.in $@ &&\
+        rm $$TEMPFILE
+
+zconf: $(SRCDIR)zconf.h.in
+        cp -p $(SRCDIR)zconf.h.in zconf.h
+
+minizip-test: static
+        cd contrib/minizip && { CC="$(CC)" CFLAGS="$(CFLAGS)" $(MAKE) test ; cd ../.. ; }
+
+minizip-clean:
+        cd contrib/minizip && { $(MAKE) clean ; cd ../.. ; }
+
+mostlyclean: clean
+clean: minizip-clean
+        rm -f *.o *.lo *~ \
+           example$(EXE) minigzip$(EXE) examplesh$(EXE) minigzipsh$(EXE) \
+           example64$(EXE) minigzip64$(EXE) \
+           infcover \
+           libz.* foo.gz so_locations \
+           _match.s maketree contrib/infback9/*.o
+        rm -rf objs
+        rm -f *.gcda *.gcno *.gcov
+        rm -f contrib/infback9/*.gcda contrib/infback9/*.gcno contrib/infback9/*.gcov
+
+maintainer-clean: distclean
+distclean: clean zconf zconf.h.cmakein
+        rm -f Makefile zlib.pc configure.log
+        -@rm -f .DS_Store
+        @if [ -f Makefile.in ]; then \
+        printf 'all:\n\t-@echo "Please use ./configure first.  Thank you."\n' > Makefile ; \
+        printf '\ndistclean:\n\tmake -f Makefile.in distclean\n' >> Makefile ; \
+        touch -r $(SRCDIR)Makefile.in Makefile ; fi
+
+tags:
+        etags $(SRCDIR)*.[ch]
+
+adler32.o zutil.o: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h
+gzclose.o gzlib.o gzread.o gzwrite.o: $(SRCDIR)zlib.h zconf.h $(SRCDIR)gzguts.h
+compress.o example.o minigzip.o uncompr.o: $(SRCDIR)zlib.h zconf.h
+crc32.o: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)crc32.h
+deflate.o: $(SRCDIR)deflate.h $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h
+infback.o inflate.o: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)inftrees.h $(SRCDIR)inflate.h $(SRCDIR)inffast.h $(SRCDIR)inffixed.h
+inffast.o: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)inftrees.h $(SRCDIR)inflate.h $(SRCDIR)inffast.h
+inftrees.o: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)inftrees.h
+trees.o: $(SRCDIR)deflate.h $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)trees.h
+
+adler32.lo zutil.lo: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h
+gzclose.lo gzlib.lo gzread.lo gzwrite.lo: $(SRCDIR)zlib.h zconf.h $(SRCDIR)gzguts.h
+compress.lo example.lo minigzip.lo uncompr.lo: $(SRCDIR)zlib.h zconf.h
+crc32.lo: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)crc32.h
+deflate.lo: $(SRCDIR)deflate.h $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h
+infback.lo inflate.lo: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)inftrees.h $(SRCDIR)inflate.h $(SRCDIR)inffast.h $(SRCDIR)inffixed.h
+inffast.lo: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)inftrees.h $(SRCDIR)inflate.h $(SRCDIR)inffast.h
+inftrees.lo: $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)inftrees.h
+trees.lo: $(SRCDIR)deflate.h $(SRCDIR)zutil.h $(SRCDIR)zlib.h zconf.h $(SRCDIR)trees.h
+	</code>
+</pre>
+<pre>
+	<code>
+make
+make install DESTDIR=/home/song/arm_libgphoto2/arm_install_zlib
+	</code>
+</pre>
+<h4> 编译 libxml2 </h4>
+<pre>
+	<code>
+./configure --prefix=/ --host=arm-rockchip830-linux-uclibcgnueabihf --with-zlib=/home/song/arm_libgphoto2/arm_install_zlib/lib --with-iconv=/home/song/arm_libgphoto2/arm_install_libiconv/lib --without-python CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<pre>
+	<code>
+make
+make install DESTDIR=/home/song/arm_libgphoto2/arm_install_libxml2
+	</code>
+</pre>
+<h3> 编译 libgphoto2 </h3>
+<pre>
+	<code class="language-shell">
+./configure --prefix=/home/song/arm_libgphoto2/install_libgphoto2 --host=arm-rockchip830-linux-uclibcgnueabihf LDFLAGS=-ldl LIBLTDL=/home/song/arm_libgphoto2/
+arm_install_libtool/lib/libltdl.a LTDLINCL=-I/home/song/arm_libgphoto2/arm_install_libtool/include LIBUSB_LIBS=/home/song/arm_libgphoto2/arm_install_libusb/lib/libusb-1.0.a /home/song/arm_l
+ibgphoto2/arm_install_libusb-compat-0.1.8/lib/libusb.a LIBUSB_CFLAGS="-I/home/song/arm_libgphoto2/arm_install_libusb/include -I/home/song/arm_libgphoto2/arm_install_libusb-compat-0.1.8/incl
+ude" LIBEXIF_CFLAGS=-I/home/song/arm_libgphoto2/arm_install_libexif/include LIBEXIF_LIBS=/home/song/arm_libgphoto2/arm_install_libexif/lib/libexif.a LIBXML2_CFLAGS=-I/home/song/arm_libgphot
+o2/arm_install_libxml2/include/libxml2 LIBXML2_LIBS=/home/song/arm_libgphoto2/arm_install_libxml2/lib/libxml2.so CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclib
+cgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-g+
++
+	</code>
+</pre>
+<pre>
+	<code class="language-shell">
+make
+make install
+	</code>
+</pre>
+<h2> 编译 gphoto2 </h2>
+<pre>
+	<code>
+sudo ./configure --prefix=/ --host=arm-rockchip830-linux-uclibcgnueabihf LDFLAGS=-ldl POPT_CFL
+AGS=-I/home/song/arm_libgphoto2/arm_install_popt/include POPT_LIBS=/home/song/arm_libgphoto2/arm_install_popt/lib/libpop
+t.a LIBLTDL=/home/song/arm_libgphoto2/arm_install_libtool/lib/libltdl.a LTDLINCL=-I/home/song/arm_libgphoto2/arm_install
+_libtool//include/ LIBUSB_LIBS=/home/song/arm_libgphoto2/arm_install_libusb/lib/libusb-1.0.a LIBUSB_CFLAGS=-I/home/song/
+arm_libgphoto2/arm_install_libusb/include LIBEXIF_CFLAGS=-I/home/song/arm_libgphoto2/arm_install_libexif/include LIBEXIF
+_LIBS=/home/song/arm_libgphoto2/arm_install_libexif/lib/libexif.a LIBGPHOTO2_LIBS="/home/song/arm_libgphoto2/install_lib
+gphoto2/lib/libgphoto2.so /home/song/arm_libgphoto2/install_libgphoto2/lib/libgphoto2_port.so" LIBGPHOTO2_CFLAGS=-I/home
+/song/arm_libgphoto2/install_libgphoto2/include --without-cdk --without-readline --without-aalib --without-jpeg --withou
+t-pthread CC=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-lin
+ux-uclibcgnueabihf-gcc CXX=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-r
+ockchip830-linux-uclibcgnueabihf-g++
+	</code>
+</pre>
+<h2> libgphoto2 应用程序的 xmake 配置 </h2>
+<p> 交叉编译工具链的配置 </p>
+<pre>
+	<code>
+xmake f -p cross --sdk=/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf
+	</code>
+</pre>
+<pre>
+	<code>
+set_version("1.0.0")
+add_rules("mode.debug", "mode.release")
+
+includes("@builtin/xpack")
+
+toolchain("luckfox")
+    set_kind("standalone")
+    set_sdkdir("/home/song/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf")
+toolchain_end()
+
+local LIBGPHOTO2_PATH = "/home/song/arm_libgphoto2/install_libgphoto2/lib/libgphoto2.so"
+local LIBGPHOTO2_PORT_PATH = "/home/song/arm_libgphoto2/install_libgphoto2/lib/libgphoto2_port.so"
+local CAMLIBS_PATH = "/home/song/arm_libgphoto2/install_libgphoto2/lib/libgphoto2/2.5.31/*"
+local IOLIBS_PATH = "/home/song/arm_libgphoto2/install_libgphoto2/lib/libgphoto2_port/0.12.2/*"
+local USB_LIBS_PATH = "/home/song/arm_libgphoto2/arm_install_libusb-compat-0.1.8/lib/libusb.so"
+local USB_LIBS_1_0_PATH = "/home/song/arm_libgphoto2/arm_install_libusb/lib/libusb-1.0.so"
+local LIBXMLE_2_PATH = "/home/song/arm_libgphoto2/arm_install_libxml2/lib/libxml2.so.2"
+
+-- 设置 SDK
+set_toolchains("luckfox")
+
+target("DSLR_plug-in")
+    -- 编译成可执行文件
+    set_kind("binary")
+
+    -- libgphoto2 库的配置
+    add_includedirs("/home/song/arm_libgphoto2/install_libgphoto2/include")
+
+    -- 设置链接库
+    add_links(LIBGPHOTO2_PATH)
+    add_links(LIBGPHOTO2_PORT_PATH)
+    add_links(USB_LIBS_PATH)
+    add_links(USB_LIBS_1_0_PATH)
+    add_links("/home/song/arm_libgphoto2/install_libgphoto2/lib/libgphoto2/2.5.31/ptp2.so")
+    add_links("/home/song/arm_libgphoto2/arm_install_libxml2/lib/libxml2.so")
+
+    -- 设置 SDK
+    set_toolchains("luckfox")
+
+    -- 源文件
+    add_files("src/*.c", "src/uart/src/*.c|main.c", "src/oled/*.c|main.c", "src/oled/i2c/*.c", "src/oled/Fonts/*.c")
+
+    -- c11 标准
+    set_languages("c11", "cxx11")
+
+xpack("DSLR_PLOG_IN")
+    set_formats("zip")
+    set_title("DSL_PLOG_IN")
+    set_author("SongZihui")
+    set_homepage("https://szhwho.top")
+    set_licensefile("LICENSE")
+    add_targets("DSLR_plug-in")
+    add_sourcefiles("(src/**)")
+
+    after_installcmd(function (package, batchcmds)
+        batchcmds:mkdir(package:installdir("lib"))
+        batchcmds:cp(LIBGPHOTO2_PATH, package:installdir("lib"), {rootdir = "src"})
+        batchcmds:cp(LIBGPHOTO2_PORT_PATH, package:installdir("lib"), {rootdir = "src"})
+        batchcmds:cp(USB_LIBS_PATH, package:installdir("lib"), {rootdir = "src"})
+        batchcmds:cp(USB_LIBS_1_0_PATH, package:installdir("lib"), {rootdir = "src"})
+        batchcmds:cp(LIBXMLE_2_PATH, package:installdir("lib"), {rootdir = "src"})
+        batchcmds:cp("./install.sh", package:installdir(""), {rootdir = "src"})
+        batchcmds:cp("./uninstall.sh", package:installdir(""), {rootdir = "src"})
+        batchcmds:mkdir(package:installdir("lib/camlibs"))
+        batchcmds:mkdir(package:installdir("lib/iolibs"))
+        batchcmds:cp(CAMLIBS_PATH, package:installdir("lib/camlibs"), {rootdir = "src"})
+        batchcmds:cp(IOLIBS_PATH, package:installdir("lib/iolibs"), {rootdir = "src"})
+    end)
+
+    after_uninstallcmd(function (package, batchcmds)
+        batchcmds:rmdir(package:installdir("lib"))
+    end)
+	</code>
+</pre>
+<h2> 疑难杂症 </h2>
+<h3> 找不着相机驱动 </h3>
+<p> 如果没有进行特别设置的话，gphoto2 或者使用了 libgphoto2 的程序运行时会去 libgphoto2 的安装目录去找，我的方式是在 luckfox 开发板上又建了一个相同的路径来存这个驱动（一些动态链接库文件）。 </p>
+<h3> /app/gphoto2: can't resolve symbol 'static_assert' </h3>
+<a href="https://stackoverflow.com/questions/78819019/after-cross-compiling-gphoto2-and-running-on-the-development-board-i-get-the-err"> StackOverflow 上我提一个问题。 </a>
+<br>
+<a href="https://github.com/gphoto/gphoto2/issues/646"> Github 上我提的 issue </a>
+<h3> 引用 </h3>
+[1] <a href="https://blog.csdn.net/qq_32605451/article/details/122540358"> 移植 libgphoto2 </a>
+<br>
+[2] <a href="https://blog.csdn.net/qq_32605451/article/details/122553514?spm=1001.2014.3001.5502"> 移植 gphoto2 </a>
+<br>
+[3] <a href="https://blog.csdn.net/qq_32605451/article/details/122667971"> 移植xml2，libiconv ，zlib </a>
 </body>
-<script>
-	hljs.highlightAuto(code, languageSubset)
-</script>
 </html>
