@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>交叉编译libgphoto2和gphoto2</title>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script></head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+	<!-- and it's easy to individually load additional languages -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/go.min.js"></script>
+</head>
 <body>
     <h1> 交叉编译libgphoto2和gphoto2 </h1>
     <p> libgphoto2（https://github.com/gphoto/libgphoto2） 库是一个支持通过PTP，MTP 协议与数码相机进行交互的库。gphoto2 则是一个基于 libgphoto2 的命令行程序。下面通过使用 luckfox sdk 中的交叉编译工具链来交叉编译，把 libgphoto2 移植到 gphoto2 </p>
     <h2> 设备树修改 </h1>
-    <code class="language-c">
+	<pre>
+    	<code>
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright (c) 2023 Luckfox Electronics Co., Ltd.
@@ -114,6 +118,9 @@
 };
 
     </code>
+</pre>
 </body>
-    hljs.highlightAll();
+<script>
+	hljs.highlightAuto(code, languageSubset)
+</script>
 </html>
