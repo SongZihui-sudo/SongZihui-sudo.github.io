@@ -156,9 +156,6 @@
             </li>
             <iframe id="page" src="./html/page/C-language/交叉编译libgphoto2和gphoto2.htm" width="100%" height="100%" frameborder="0" allowfullscreen>
             </iframe>
-            <li>
-                <div id="gitalk-container"></div>
-            </li>
             <div class="status-bar">
                 <p class="status-bar-field">connect:
                     1751122876@qq.com</p>
@@ -172,13 +169,14 @@
 <script>
     function changeFrameHeight() {
         var ifm = document.getElementById("page");
-        ifm.height = document.documentElement.clientHeight * 0.9;
+        ifm.height = document.documentElement.clientHeight*0.8;
         var main_window = document.getElementById("main_window");
         main_window.height = document.documentElement.clientHeight;
     }
     window.onresize = function () {
         changeFrameHeight();
     }
+    changeFrameHeight()
     const gitalk = new Gitalk({
         clientID: 'GitHub Application Client ID',
         clientSecret: 'GitHub Application Client Secret',
