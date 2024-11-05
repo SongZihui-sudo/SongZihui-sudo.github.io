@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSLR-PLOGIN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <h1> DSLR-PLOGIN 单反相机插件 </h1>
+    <p> 旧时新提，时间过的很快，转眼现在已经快要入冬了，想起还没有写一个帖子和大家分享暑假在家做的一个业余项目，就是这个 DSLR-PLOGIN，我将其成为单反相机插件。如下图： </p>
+    <img style="border-radius: 0.3125em;
+                box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+        src="../../../../static/f55a3abb316d52c46f26f58f5078cc0(1).jpg" width="100%">
+    <p>
+        可见该插件与相机的连接是通过相机机身上的usb接口。实现了一些功能：虽然看起来都不完善吧，哈哈。
+    </p>
+    <ul>
+        <li>
+            1. 肩屏功能
+        </li>
+        <li>
+            2. 蓝牙遥控拍摄(这个有bug还，要等我在放假回家会在弄一下)
+        </li>
+        <li>
+            3. 通过蓝牙远程查看各种参数。
+        </li>
+    </ul>
+    <p>
+        演示视频，我之前发在过哔哩哔哩上。
+        <a href="https://www.bilibili.com/video/BV1b1YBeaENz/?spm_id_from=333.999.0.0"> 视频 </a>
+    </p>
+    <h2> 具体功能的实现 </h2>
+    <p>
+        代码我开源在此处：
+        <a href="https://github.com/SongZihui-sudo/DSLR-PLOGIN"> 代码 </a>
+    </p>
+    <h3> 硬件实现 </h3>
+    <p>
+        主要是使用了<cite> LuckFox Pico Mini B </cite>，这个板子板载flash可以不用额外的储存卡，内存也很大，价格也不是很贵，最重要的是还支持 linux，这算是打下了这个项目的基础。
+    </p>
+    <p>
+        其次是<cite> JDY-33 </cite> 蓝牙模块，最后就是一个 <cite> 0.96寸的 oled 屏 </cite>
+    </p>
+    <img style="border-radius: 0.3125em;
+                    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+        src="https://wiki.luckfox.com/zh/assets/images/LUCKFOX-PICO-MINI-GPIO-d000d5d50133f835cbde5525e7528597.jpg" width="100%">
+    <p> 总体上采用一块 <cite> 3.7 V 锂电池 </cite> 供电经一个充电保护模块（把电压降至 3V ）连接至luckfox pico mini B，然后在 53， 52 脚连接蓝牙模块，59，58 脚连接屏幕。最后焊了一个板子集成了这些东西。 </p>
+    <h2> 软件实现 </h2>
+    <h3> gphoto2 和 libgphoto2 的交叉编译 </h3>
+    <p> 
+        这可以参考我写的这一篇文章<a href="../../C-language/交叉编译libgphoto2和gphoto2.htm"> gphoto2 和 libgphoto2 的交叉编译 </a> 
+        想要直接编程去读相机内的信息几乎不可能，所以只能借助一些库，这里让搭载 linux 的 luckfox pico 连接 相机，相机作为一个 usb 从设备，缺点是这样无法查看相册。之后，通过libgphoto2 库去读取相机内的信息，然后我在用蓝牙模块给传出来，但遇到的一个 bug 如果通过 libgphoto2 库去拍照的时候，虽然相机会有拍照动作，但拍完会报错（大概意思是连接usb不可打开相册），照片不会存下来。
+    </p>
+    <h3> 主要逻辑 </h3>
+    <pre>
+        <code class="language-c">
+        int main( int argc, char** argv )
+        {
+            int ret;
+            char* owner;
+            CameraText text;
+            void* evtdata;
+            
+            context = sample_create_context( ); /* see context.c */
+            gp_camera_new( &camera );
+            
+            ret = gp_camera_init( camera, context );
+            if ( ret < GP_OK ) 
+            { 
+                printf( "No camera auto detected.\n" ); 
+                gp_camera_free( camera ); return 0; 
+            } 
+            // 打开串口
+            serial_fd=uart_open( 4 ); 
+            uart_init( serial_fd );
+            // 创建蓝牙轮询子线程
+            pthread_t tid[2];
+            int t_ok=pthread_create( &tid[0],NULL, repl_booltooth, NULL ); assert( t_ok ); 
+            // oled 初始化 
+            if ( DEV_ModuleInit( ) !=0 ) 
+            { 
+                return -1; 
+            }
+            printf( "OLED Init...\r\n" ); 
+            OLED_Init( ); 
+            OLED_Clear( ); 
+            // 子线程在 oled 屏幕上显示信息 
+            t_ok=pthread_create( &tid[1], NULL,r_oled, NULL ); 
+            assert( t_ok ); 
+            // 等这两个进程 
+            for ( int i=0; i < 2; i++ ) 
+            { 
+                int ret=pthread_join( tid[i], NULL ); 
+            } 
+            //释放资源 
+            pthread_exit( NULL ); 
+            uart_close( serial_fd ); 
+            gp_camera_exit( camera, context ); 
+            gp_camera_free( camera );
+            gp_context_unref( context ); 
+            return 0; 
+        }
+        </code>
+    </pre>
+    先打开蓝牙串口，然后创建一个子进程专门用来与用户进行交互，之后初始化 <cite> oled 屏幕 </cite>，最后相机器轮询机器的信息显示出来。
+    <h2> 结论 </h2>
+    最后还是感觉入门机器的功能有点不够了，打算换机身。
+
+    <h2> 参考 </h2>
+    <ul>
+        <li>
+            1. https://wiki.luckfox.com/zh/Luckfox-Pico/Luckfox-Pico-quick-start/
+        </li>
+        <li>
+            2. https://blog.csdn.net/qq_32605451/article/details/122553514
+        </li>
+        <li>
+            3. http://gphoto.org/
+        </li>
+        <li>
+            4. https://blog.csdn.net/qq_32605451/article/details/122540358?spm=1001.2014.3001.5501
+        </li>
+    </ul>
+
+</body>
+</html>
