@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐式马尔可夫模型</title>
+</head>
+<body>
+    <h1>隐式马尔可夫模型</h1>
+<h2>HMM</h2>
+<p>隐马尔可夫模型（Hidden Markov Model, HMM）是一种统计模型，用于描述一个含有隐含未知参数的马尔可夫过程。它在语音识别、自然语言处理、生物信息学、金融分析等领域有着广泛的应用。
+HMM 中的几个重要的组成部分为<strong>状态集合</strong>，<strong>观测集合</strong>，<strong>状态转移概率</strong>，<strong>发射概率</strong>，<strong>状态初始概率</strong>组成。以天气预报举例，状态集合为晴天（Sunny）、多云（Cloudy）和雨天（Rainy）不是直接观察得到的，而是预测出的；观测集合为晴，有雨，有云等，可以直接观测到；状态转移概率有一个状态转移到另一个状态的概率；一般可以假设各个状态平均分布创建状态初始概率；发射概率是在一个状态下观测到一个结果的概率。</p>
+<h3>发射概率矩阵例子</h3>
+<p>假设我们有一个天气预报的HMM，其中状态集合为{晴天（S），多云（C），雨天（R）}，观测集合为{晴（O1），多云（O2），雨（O3），部分云（O4），雷阵雨（O5）}。发射概率矩阵可能如下所示：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>O1</th><th>O2</th><th>O3</th><th>O4</th><th>O5</th></tr></thead><tbody><tr><td><strong>S</strong></td><td>0.8</td><td>0.1</td><td>0.05</td><td>0.05</td><td>0</td></tr><tr><td><strong>C</strong></td><td>0.1</td><td>0.6</td><td>0.1</td><td>0.2</td><td>0</td></tr><tr><td><strong>R</strong></td><td>0</td><td>0.1</td><td>0.7</td><td>0.1</td><td>0.1</td></tr></tbody></table>
+<p>在这个矩阵中，每个元素 $P(o∣s)$表示在状态 ss 下观测到观测 oo 的概率。例如，$P(O_{1}∣S)=0.8$ 表示在晴天状态下观测到晴的概率为0.8。</p>
+<h3>转移概率矩阵例子</h3>
+<p>通过统计输入的数据可以得出转移概率矩阵。例如：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>S</th><th>C</th><th>R</th></tr></thead><tbody><tr><td><strong>S</strong></td><td>0.7</td><td>0.2</td><td>0.1</td></tr><tr><td><strong>C</strong></td><td>0.3</td><td>0.5</td><td>0.2</td></tr><tr><td><strong>R</strong></td><td>0.4</td><td>0.2</td><td>0.8</td></tr></tbody></table>
+<p>这个矩阵表示了从一个状态转移到另一个状态的概率。例如，如果今天是晴天，那么明天有70%的概率仍然是晴天，20%的概率变成多云，10%的概率变成雨天。</p>
+<h3>计算</h3>
+<p>比如要计算连续三天都是晴天的例子。
+第一天：$P(S) = 0.33$ 初始概率
+第二天：第一天-&gt;第二天，状态变化为晴天-&gt;晴天。$P(S) \times P(S\to S) = 0.33 \times 0.7 = 0.231$
+第三天：与前面相似，继续相乘。$P(S) \times P(S\to S) \times P(S \to S) = 0.1617$</p>
+<h2>中文分词</h2>
+<p>在进行中文分词时加入了四种状态每个字对应一个状态，分别是 <code>B</code>（词的开头）、<code>M</code>（词的中间）、<code>E</code>（词的结尾）、<code>S</code>（单字成词）。观测集合就是输入的句子中的每一个字。初始概率矩阵需要统计数据集。还有发射概率矩阵。</p>
+<h3>初始概率矩阵</h3>
+<p>直接统计一个数据集中 B, M, E, S 概率分别是多少。例如：
+$$ π={P(B)=0.5,P(M)=0,P(E)=0,P(S)=0.5} $$</p>
+<h3>转移概率矩阵</h3>
+<p>转移概率表示隐马尔可夫模型（HMM）中从一个状态转移到另一个状态的概率，用公式表示为：
+$$
+P(sj​∣si​)= \frac{状态&nbsp;si​&nbsp;出现的总次数}{状态&nbsp;si​&nbsp;转移到状态&nbsp;sj​&nbsp;的次数}​
+$$
+统计从一种状态转移到另一种状态的概率。例如：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>B</th><th>M</th><th>E</th><th>S</th></tr></thead><tbody><tr><td><strong>B</strong></td><td>0</td><td>0.4</td><td>0.6</td><td>0</td></tr><tr><td><strong>M</strong></td><td>0</td><td>0.4</td><td>0.6</td><td>0</td></tr><tr><td><strong>E</strong></td><td>0.333</td><td>0</td><td>0</td><td>0.667</td></tr><tr><td><strong>S</strong></td><td>0.444</td><td>0</td><td>0</td><td>0.556</td></tr><tr><td>需要符合约束。</td><td></td><td></td><td></td><td></td></tr></tbody></table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>B</th><th>M</th><th>E</th><th>S</th></tr></thead><tbody><tr><td>B</td><td>0</td><td></td><td></td><td>0</td></tr><tr><td>M</td><td>0</td><td></td><td></td><td>0</td></tr><tr><td>E</td><td></td><td>0</td><td>0</td><td></td></tr><tr><td>S</td><td></td><td>0</td><td>0</td><td></td></tr></tbody></table>
+<h3>转移概率矩阵</h3>
+<p>发射概率是隐马尔可夫模型（HMM）中的关键部分，它表示一个隐状态 s 发射出观测符号 o 的概率，用公式表示为：</p>
+<p>$$
+P(o | s) = \frac{\text{状态 } s \text{ 发射符号 } o \text{ 的次数}}{\text{状态 } s \text{ 的总发射次数}}
+$$
+通过统计：
+遍历语料，统计每个状态 sss 发射每个观测符号 o 的频次。例如：</p>
+<ul>
+<li>"我/B"：记录 B→我B \to 我B→我 出现 1 次。</li>
+<li>"爱/S"：记录 S→爱S \to 爱S→爱 出现 1 次。</li>
+<li>"自然/B"：记录 B→自然B \to 自然B→自然 出现 1 次。</li>
+<li>"语言/E"：记录 E→语言E \to 语言E→语言 出现 1 次。
+得到转移概率矩阵为：</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>状态 \ 符号</th><th>我</th><th>自然</th><th>爱</th><th>语言</th><th>处理</th><th>技术</th></tr></thead><tbody><tr><td>BBB</td><td>0.01</td><td>0.01</td><td>0</td><td>0</td><td>0.01</td><td>0</td></tr><tr><td>SSS</td><td>0</td><td>0</td><td>0.02</td><td>0</td><td>0</td><td>0</td></tr><tr><td>EEE</td><td>0</td><td>0</td><td>0</td><td>0.014</td><td>0</td><td>0.014</td></tr></tbody></table>
+<h3>维特比算法</h3>
+<p>维特比算法是一种动态规划算法，通过逐步计算每一步的最优路径和概率，最终找到全局最优路径。<br>
+公式如下：</p>
+<h4>定义</h4>
+<ul>
+<li>$\delta_t(s)$：到时间 t 时，以状态 s 结束的所有路径中，具有最大概率的路径的概率。</li>
+<li>$\psi_t(s)$：记录到达时间 t 时，以状态 s 结束的路径的前一个最优状态。</li>
+</ul>
+<h4>动态规划公式</h4>
+<ol>
+<li>
+<p><strong>初始化</strong>（第一个观测符号）：
+$$
+δ1(s)=π(s)⋅B(s,o1),ψ1(s)=0$$
+其中，$π(s)$ 是初始状态概率，$B(s,o1)$ 是状态 s 发射观测符号 $o_1$​ 的概率。</p>
+</li>
+<li>
+<p><strong>递推</strong>（从第 2 个符号到第 TTT 个符号）：
+$$
+δt​(s)=max_{s}​[δ_{t - 1}​(s′)⋅A(s′,s)]⋅B(s,o_{t}​)
+$$ $$
+ψt​(s)=argmax_{s}​[δt−1​(s′)⋅A(s′,s)]
+$$
+其中，$A(s′,s)$ 是从状态 $s′$ 转移到 $s$ 的概率，$B(s,o_t)$ 是状态 s 发射 $o_t$​ 的概率。</p>
+</li>
+<li>
+<p><strong>终止</strong>（找到最优结束状态）：
+$$  P_{max}=max⁡_{s}δ_{T}(s)  $$
+$$s_{T}​=argmax_{s}​δ_{T}​(s)$$</p>
+</li>
+<li>
+<p><strong>回溯</strong>（通过 $\psi_t(s)$ 找到最优路径）：
+$$
+st−1=ψ_{t}(s_{t}),t=T,T−1,…,2
+$$</p>
+</li>
+</ol>
+<h4>假设模型参数</h4>
+<p>假设以下参数：</p>
+<ul>
+<li><strong>状态集合</strong>：$S={B,M,E,S}$</li>
+<li><strong>观测序列</strong>：$O=["我","爱","自然","语言","处理"]$</li>
+<li><strong>初始概率</strong>：$π(B)=0.5,π(M)=0,π(E)=0,π(S)=0.5$</li>
+<li><strong>转移概率</strong>： $A(B→M)=0.8, A(B→E)=0.2, A(E→B)=0.5$</li>
+<li><strong>发射概率</strong>： $B(B,"我")=0.5, B(S,"我")=0.4,…$</li>
+</ul>
+<h4>1. 初始化</h4>
+<p>对于第一个字 "我"：</p>
+<p>$$
+δ1​(B)=π(B)⋅B(B,"我")=0.5⋅0.5=0.25
+$$
+$$
+δ1​(S)=π(S)⋅B(S,"我")=0.5⋅0.4=0.2
+$$</p>
+<h4>2. 递推</h4>
+<p>对于第二个字 "爱"：</p>
+<p>$δ2​(B)=max[δ1​(B)⋅A(B→B),δ1​(S)⋅A(S→B)]⋅B(B,"爱") =$
+$max⁡[0.25⋅0.5,0.2⋅0.5]⋅0.5=0.0625$
+$$
+δ2​(E)=max[δ1​(B)⋅A(B→E),δ1​(S)⋅A(S→E)]⋅B(E,"爱")
+$$
+记录前一步的最优状态：</p>
+<p>$$
+ψ2​(B)=args′max​[δ1​(s′)⋅A(s′→B)]
+$$</p>
+<p>重复类似步骤，直到最后一个字 "处理"。</p>
+<h4>4. 回溯</h4>
+<p>从终止时的最优状态开始，根据 $\psi_t(s)$ 回溯每一步的最优状态，得到完整的状态序列。</p>
+</body>
+</html>
