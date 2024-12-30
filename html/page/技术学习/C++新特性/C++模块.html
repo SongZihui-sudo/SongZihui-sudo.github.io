@@ -1,0 +1,148 @@
+<h1>C++20 C++23 模块</h1>
+<blockquote>
+<p>在 2024 年的最后一天，再来更新一篇博客，关于 C++ 20，23 新特性模块。</p>
+</blockquote>
+<h2>环境配置</h2>
+<p>我用的环境为 clang 19.1.0，尽量使用官网的包，而不要用 apt 直接安装。</p>
+<pre class="language-bash"><code class="language-bash code-highlight"><span class="code-line line-number" line="1"><span class="token function">wget</span> https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.1/LLVM-19.1.1-Linux-X64.tar.xz 
+</span></code></pre>
+<p>解压。</p>
+<pre class="language-bash"><code class="language-bash code-highlight"><span class="code-line line-number" line="1"><span class="token function">tar</span> <span class="token parameter variable">-xf</span> xx.tar.xz <span class="token parameter variable">-C</span> llvm/
+</span></code></pre>
+<p>添加环境变量。</p>
+<pre class="language-bash"><code class="language-bash code-highlight"><span class="code-line line-number" line="1"><span class="token function">vim</span> /etc/profile
+</span></code></pre>
+<p>添加下面两句。</p>
+<pre class="language-bash"><code class="language-bash code-highlight"><span class="code-line line-number" line="1"><span class="token builtin class-name">export</span> <span class="token assign-left variable">LLVM_PATH</span><span class="token operator">=</span>you_llvm_path
+</span><span class="code-line line-number" line="2"><span class="token builtin class-name">export</span> <span class="token assign-left variable"><span class="token environment constant">PATH</span></span><span class="token operator">=</span><span class="token variable">$LLVM_HOME</span><span class="token builtin class-name">:</span><span class="token environment constant">$PATH</span>
+</span></code></pre>
+<p>刷新一下</p>
+<pre class="language-bash"><code class="language-bash code-highlight"><span class="code-line line-number" line="1"><span class="token builtin class-name">source</span> /etc/profile
+</span><span class="code-line line-number" line="2"><span class="token builtin class-name">source</span> ~/.bashrc
+</span></code></pre>
+<h2>C++模块</h2>
+<h3>xmake 配置</h3>
+<pre class="language-lua"><code class="language-lua code-highlight"><span class="code-line line-number" line="1"><span class="token function">add_rules</span><span class="token punctuation">(</span><span class="token string">"mode.debug"</span><span class="token punctuation">,</span> <span class="token string">"mode.release"</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="2">
+</span><span class="code-line line-number" line="3"><span class="token function">target</span><span class="token punctuation">(</span><span class="token string">"stdmodules"</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="4">    <span class="token function">set_kind</span><span class="token punctuation">(</span><span class="token string">"binary"</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="5">    <span class="token function">add_files</span><span class="token punctuation">(</span><span class="token string">"src/*.c"</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="6">    <span class="token function">add_files</span><span class="token punctuation">(</span><span class="token string">"src/*.cpp"</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="7">    <span class="token function">set_policy</span><span class="token punctuation">(</span><span class="token string">"build.c++.modules"</span><span class="token punctuation">,</span> <span class="token keyword">true</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="8">    <span class="token function">set_runtimes</span><span class="token punctuation">(</span><span class="token string">"c++_shared"</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="9"><span class="token function">target_end</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</span></code></pre>
+<h3>C++23 Std Modules</h3>
+<p>这个目前 msvc 支持的比较好，gcc 不支持，clang 支持。</p>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="2">
+</span><span class="code-line line-number" line="3"><span class="token keyword">auto</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-&gt;</span> <span class="token keyword">int</span>
+</span><span class="code-line line-number" line="4"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="5">    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> <span class="token string">"hello world!"</span> <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span><span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="6">    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="7"><span class="token punctuation">}</span>
+</span></code></pre>
+<h3>模块定义</h3>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token keyword">module</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="2">
+</span><span class="code-line line-number" line="3"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>     <span class="token comment">// 模块 import</span>
+</span><span class="code-line line-number" line="4"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"test.h"</span>   <span class="token comment">// 头文件 include</span></span>
+</span><span class="code-line line-number" line="5">
+</span><span class="code-line line-number" line="6"><span class="token keyword">export</span> <span class="token keyword">module</span> <span class="token module">module_a</span><span class="token punctuation">;</span>
+</span></code></pre>
+<h3>export</h3>
+<p>使用 <code>export</code> 来到出模块内的类，函数，变量。</p>
+<p><strong>类</strong></p>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// module_class.cpp</span>
+</span><span class="code-line line-number" line="2"><span class="token keyword">module</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="3">
+</span><span class="code-line line-number" line="4"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="5"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"test.h"</span></span>
+</span><span class="code-line line-number" line="6">
+</span><span class="code-line line-number" line="7"><span class="token keyword">export</span> <span class="token keyword">module</span> <span class="token module">module_class</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="8">
+</span><span class="code-line line-number" line="9"><span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">test_class</span>
+</span><span class="code-line line-number" line="10"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="11">    <span class="token keyword">public</span><span class="token operator">:</span>
+</span><span class="code-line line-number" line="12">        <span class="token function">test_class</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">default</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="13">
+</span><span class="code-line line-number" line="14">        <span class="token keyword">auto</span> <span class="token function">test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-&gt;</span> <span class="token keyword">void</span>
+</span><span class="code-line line-number" line="15">        <span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="16">            <span class="token function">test_h_test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="17">        <span class="token punctuation">}</span>    
+</span><span class="code-line line-number" line="18">
+</span><span class="code-line line-number" line="19">    <span class="token keyword">private</span><span class="token operator">:</span>
+</span><span class="code-line line-number" line="20"><span class="token punctuation">}</span><span class="token punctuation">;</span>
+</span></code></pre>
+<p><strong>函数</strong></p>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// module_function.cpp</span>
+</span><span class="code-line line-number" line="2"><span class="token keyword">module</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="3">
+</span><span class="code-line line-number" line="4"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="5">
+</span><span class="code-line line-number" line="6"><span class="token keyword">export</span> <span class="token keyword">module</span> <span class="token module">module_function</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="7">
+</span><span class="code-line line-number" line="8"><span class="token keyword">export</span> <span class="token keyword">auto</span> <span class="token function">module_test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-&gt;</span> <span class="token keyword">void</span>
+</span><span class="code-line line-number" line="9"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="10">    std<span class="token double-colon punctuation">::</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Hello from test_function!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="11"><span class="token punctuation">}</span>
+</span></code></pre>
+<p><strong>变量</strong></p>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// module_var.cpp</span>
+</span><span class="code-line line-number" line="2"><span class="token keyword">module</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="3">
+</span><span class="code-line line-number" line="4"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="5">
+</span><span class="code-line line-number" line="6"><span class="token keyword">export</span> <span class="token keyword">module</span> <span class="token module">module_var</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="7">
+</span><span class="code-line line-number" line="8"><span class="token keyword">export</span> std<span class="token double-colon punctuation">::</span>string var <span class="token operator">=</span> <span class="token string">"Hello from module_var!"</span><span class="token punctuation">;</span>
+</span></code></pre>
+<p><strong>在另一个模块文件里实现类，函数</strong></p>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// module_test.mxx</span>
+</span><span class="code-line line-number" line="2"><span class="token keyword">export</span> <span class="token keyword">module</span> <span class="token module">module_test</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="3">
+</span><span class="code-line line-number" line="4"><span class="token keyword">export</span> <span class="token keyword">void</span> <span class="token function">test_function_2</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="5">
+</span><span class="code-line line-number" line="6"><span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">test_class_2</span>
+</span><span class="code-line line-number" line="7"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="8"><span class="token keyword">public</span><span class="token operator">:</span>
+</span><span class="code-line line-number" line="9">    <span class="token keyword">void</span> <span class="token function">test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="10"><span class="token punctuation">}</span><span class="token punctuation">;</span>
+</span></code></pre>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// module_test.cpp</span>
+</span><span class="code-line line-number" line="2">
+</span><span class="code-line line-number" line="3"><span class="token keyword">module</span> <span class="token module">module_test</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="4">
+</span><span class="code-line line-number" line="5"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="6">
+</span><span class="code-line line-number" line="7"><span class="token keyword">void</span> <span class="token function">test_function_2</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="8"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="9">    std<span class="token double-colon punctuation">::</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"test_function_2\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="10"><span class="token punctuation">}</span>
+</span><span class="code-line line-number" line="11">
+</span><span class="code-line line-number" line="12"><span class="token keyword">void</span> test_class_2<span class="token double-colon punctuation">::</span><span class="token function">test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="13"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="14">    std<span class="token double-colon punctuation">::</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"test_function2\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="15"><span class="token punctuation">}</span>
+</span></code></pre>
+<h3>import</h3>
+<p>使用 <code>import</code> 来导入模块。</p>
+<pre class="language-cpp"><code class="language-cpp code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// main.cpp</span>
+</span><span class="code-line line-number" line="2"><span class="token keyword">import</span> <span class="token module">std</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="3"><span class="token keyword">import</span> <span class="token module">module_class</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="4"><span class="token keyword">import</span> <span class="token module">module_function</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="5"><span class="token keyword">import</span> <span class="token module">module_var</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="6"><span class="token keyword">import</span> <span class="token module">module_test</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="7">
+</span><span class="code-line line-number" line="8"><span class="token keyword">auto</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-&gt;</span> <span class="token keyword">int</span>
+</span><span class="code-line line-number" line="9"><span class="token punctuation">{</span>
+</span><span class="code-line line-number" line="10">    test_class test<span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="11">    test<span class="token punctuation">.</span><span class="token function">test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="12">    <span class="token function">module_test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="13">    std<span class="token double-colon punctuation">::</span>cout<span class="token operator">&lt;&lt;</span> var <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="14">    <span class="token function">test_function_2</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="15">    test_class_2 test2<span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="16">    test2<span class="token punctuation">.</span><span class="token function">test_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="17">    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+</span><span class="code-line line-number" line="18"><span class="token punctuation">}</span>
+</span></code></pre>
