@@ -72,6 +72,24 @@ DigitalFilm
 ![fuji_color_200](./image/fuji_color_200(2).jpg)
 
 ---
+layout: top-title-two-cols
+color: indigo
+---
+
+::title::
+DigitalFilm  
+
+::left::
+Kodak gold 200
+
+![kodak gold 200](./image/colortest_kodak_gold_200.jpg)
+
+::right::
+Fuji Color 200
+
+![Fuji Color 200](./image/colortest_fuji_color_200.jpg)
+
+---
 layout: top-title
 color: indigo
 ---
