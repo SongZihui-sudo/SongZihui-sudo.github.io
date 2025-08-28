@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>驱动P102矿卡与TeslaP4计算卡.htm</title>
+</head>
+<body>
+    <center>
+        <img style="border-radius: 0.3125em;
+                    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/e5dccf2e-f1cf-4c34-9d85-eae930f3cb77" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                    display: inline-block;
+                    color: #999;
+                    padding: 2px;">任务管理器截图</div>
+    </center>
+    <p>
+        上个学期我在咸鱼上买过一张 P102-100 矿卡，用来做一做深度学习实验。意外的是，这张卡在微星小飞机降频后，稳定运行了半年。hpz440 的主板正好还有空间（pcie x16 -> p4, pcie x 4 -> p102, pcie
+        x1 -> gf405），于是前几天我又入手了一张 Tesla P4 计算卡，想着试试能不能和 P102 一起驱动。
+        <br>
+        一开始我直接插上 P4，装了雨塘科技的 566.14 驱动，但在设备管理器里 P4 只显示为 “3D 视频控制器”。于是我又参考 B 站 UP 主 CreamDft 的帖子，下载了他修改过的 388.19 驱动，结果这次 P4
+        能正常识别，但 P102 在手动安装驱动时却提示没有相关驱动。之后我不断尝试不同版本的驱动，始终会有一张显卡出现感叹号（错误 43）。好在反复折腾后，
+        根据 [使用Tesla P4显卡炼丹与游戏的环境配置(CUDA9.0 \ PyTorch1.1.0 \ DirectX 12.0) ] 帖子里 pzqking 提到的 cuda10.0 自带的 411 版本驱动, 最终还是成功把两张卡都驱动起来了：
+        P102 在系统里识别成了 GTX 1080 Ti，而亮机卡(gf405)因为年代太久，只能显示为 “基本显示适配器”。
+    </p>
+    <center>
+        <img style="border-radius: 0.3125em;
+                        box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/727a226d-160d-421a-98f6-6042bc830ea0" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                        display: inline-block;
+                        color: #999;
+                        padding: 2px;">nvidia-smi</div>
+    </center>
+    <p>
+        <b> 操作方法 </b>
+        <ul>
+            <li>
+                这种方法要开启 Windows 的测试模式，。
+            </li>
+            <li>
+                下载官方的 <b> cuda 10.0 </b> 驱动。
+            </li>
+            <li>
+                找到 <code> cuda_10.0.130_411.31_win10\universal\Display.Drive\nv_dispui.inf </code> 文件。<br>
+            </li>
+            <li>
+                在文件中找到 <code> %NVIDIA_DEV.1B06% = Section052, PCI\VEN_10DE&DEV_1B06 </code>, 在下面加入 
+                <code> %NVIDIA_DEV.1B06% = Section052, PCI\VEN_10DE&DEV_1B07 </code>
+            </li>
+            <li> 保存文件，然后安装驱动 </li>
+            <li>
+                <code> win + r </code> 输入 <code> > regedit </code> 打开注册表，然后找到 <code> 计算机\HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318} </code>
+                <br>
+                然后可以看到有 <code> 0000, 0001, 0002, 0003 </code>，在这里面找到 P4 的注册表，然后修改 <code> AdapterType </code> 值为 <code> 0 </code>,
+                再加入 <code> EnableMsHybrid </code> 类型为 <code> DWORD </code> 32位，值为 <code> 1 </code>
+            </li>
+            <li>
+                打开设备管理器，禁用 P4，然后在打开，这是在任务管理器中可以看到 <code> 1080TI, P4 </code>。
+            </li>
+            <li>
+                完成
+            </li>
+        </ul>
+        <p>
+            这个方法优点两个显卡都可以工作在 WDDM 模式，这种方法安装完没有英伟达控制面板不知道为什么。
+        </p>
+        <b> 另一种操作方法 </b>
+        <ul>
+            <li>
+                开启 windows 系统测试模式
+            </li>
+            <li>
+                下载官方的 DATACENTER 驱动（适用于计算卡）和一个可以兼容 1080TI 的桌面驱动。
+            </li>
+            <li>
+                和前面一样修改桌面驱动加入 P102-100 的硬件 ID。
+            </li>
+            <li>
+                打开设备管理器，在其他设备会有两个3D控制器，根据属性里的详细信息来分辨那个是 P4 哪个是 P102。<b>  先安装 P4 驱动</b>，然后右键更新驱动程序，手动选择刚刚下载的 <code>datacenter</code> 驱动进行安装。
+            </li>
+            <li>
+                去上一步相似，右键 P102 更新驱动程序，手动选择刚刚魔改好的驱动进行安装。
+            </li>
+            <li>
+                完成
+            </li>
+        </ul>
+        这样方法确定是 P4 只能工作在 TCC 模式不能切换，如果修改 P4 注册表的话会 43 错误，第一种可以。
+        <br>
+        另外发现一个现象就是我的显卡的显存一开始开启了纠错的所以显存为7500MB大概，但是之前尝试安装了一个 grid 驱动安装完可以打开英伟达控制面板切换模式然后取消纠错，这个<b>取消纠错</b>即使换了驱动也生效。
+    </p>
+
+    <center>
+        <img style="border-radius: 0.3125em;
+                            box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/4256cf5c-9193-44c1-8cf6-9b5b7ba3aed5" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                            display: inline-block;
+                            color: #999;
+                            padding: 2px;">NVIDIA P102-100</div>
+    </center>
+    <center>
+        <img style="border-radius: 0.3125em;
+                                box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/bf495507-8d29-4c1b-83a7-ee1ba66e82ac" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                                display: inline-block;
+                                color: #999;
+                                padding: 2px;">Tesla P4</div>
+    </center>
+    <p>
+        <b> 引用 </b>
+        <ul>
+            <li>
+                使用Tesla P4显卡炼丹与游戏的环境配置(CUDA9.0 \ PyTorch1.1.0 \ DirectX 12.0) https://www.bilibili.com/opus/577723292301160234
+            </li>
+            <li>
+                从Tesla P4 计算卡变游戏卡的驱动心路历程（对比驱动进步只在细致之中）赏花赏月赏UP https://www.bilibili.com/opus/761363617229570082?spm_id_from=333.1387.0.0
+            </li>
+            <li>
+                [整合驱动]让GeForce和Tesla计算卡双N卡组合在Win10/11中实现TESLA的正常游戏调用 https://www.bilibili.com/opus/893533225445490710
+            </li>
+        </ul>
+    </p>
+</body>
+</html>

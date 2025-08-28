@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炸电容！线列扫描仪底板</title>
+</head>
+<body>
+    <center>
+        <img style="border-radius: 0.3125em;
+                box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/a033495f-3bbd-4ca2-923f-e5c36f675a06" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                display: inline-block;
+                color: #999;
+                padding: 2px;">炸电容！</div>
+    </center>
+
+    <p>
+        首先是 TCD2901D 模块，基于东芝的TCD2901D，TCD2901D 具体的参数为：
+        <ul>
+            <li>
+                像素数：总计 10560 像素，像素间距 2.5 μm × 8 μm，适用于高分辨率扫描成像；
+            </li>
+            <li>
+                输出形式：模拟电压信号，需要外部驱动时序与模数转换器（ADC）配合使用；
+            </li>
+        </ul>
+    </p>
+
+    <center>
+        <img style="border-radius: 0.3125em;
+            box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/64a0ee06-c6ce-44d3-9503-ee855d52c321" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+            display: inline-block;
+            color: #999;
+            padding: 2px;">TCD2901D 模块</div>
+    </center>
+
+    <p>
+        为了配合 TCD2901D 的使用，需要将其输出的三路模拟电压信号分别转换为数字信号，因此本设计中采用了 三个 ADC1175 进行并行采集。
+        <br>
+        ADC1175 特性：
+        <ul>
+            <li>
+                分辨率：8 位；
+            </li>            
+            <li>
+                采样速率：最高可达 20 MSPS
+            </li>
+            <li>
+                输入范围：典型 0~5 V，支持单端输入
+            </li>
+            <li>
+                接口形式：并行数据输出，便于与 FPGA/逻辑电路直接连接。
+            </li>
+        </ul>
+    </p>
+
+    <center>
+        <img style="border-radius: 0.3125em;
+                box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/c4837085-c7f8-4576-8fbf-4deffeb995e6" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                display: inline-block;
+                color: #999;
+                padding: 2px;">ADC1175 模块</div>
+    </center>
+
+    <p>
+        RGB 三种颜色分别对应了三个 ADC，每种颜色用 8 位来表示，总共 24 位。
+    </p>
+
+    <p>
+        系统的底板核心为 瑞芯微 RK3506G2（基于三核Cortex-A7处理器并有丰富的接口，内置 128MB DDR3 内存），采用官方核心板方案。
+        <br>
+        底板主要资源包括：
+        <ul>
+            <li>
+                网络接口：1 路以太网口，1个 rtl8723 wifi 与 蓝牙；
+            </li>
+            <li>
+                USB 接口：1 路标准 USB Host 接口，可外接存储设备或外设；
+            </li>
+            <li>
+                Type-C 接口：主要用于程序下载与调试；
+            </li>
+            <li>
+                指示与交互：3 个可编程 LED 指示灯，2 个用户按键，可用于状态显示与功能控制；
+            </li>
+            <li>
+                存储扩展：1 个 TF 卡插槽，用于系统启动或数据存储；
+            </li>
+            <li>
+                电源输入：12V 直流输入，内部通过电源管理电路转换为核心板及外设所需的各路电压；
+            </li>
+            <li>
+                其他 IO：预留若干未使用的 IO 引脚，便于后续功能扩展。
+            </li>
+        </ul>
+    </p>
+
+    <center>
+        <img style="border-radius: 0.3125em;
+                    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://github.com/user-attachments/assets/87b6bae0-3ad6-435f-9040-cf0de0bf67f6" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                    display: inline-block;
+                    color: #999;
+                    padding: 2px;">底板</div>
+    </center>
+
+    <p>
+        该核心板通过标准接口与自研底板连接，并扩展出多种常用外设接口，方便开发与调试
+    </p>
+</body>
+
+</html>
