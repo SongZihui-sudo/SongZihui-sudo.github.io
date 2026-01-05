@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记-在5090上安装xformers</title>
+</head>
+<body>
+    <h1> 记-在5090上安装xformers </h1>
+    <p> 在本地代码可以正常的使用，但是因为 xformers 官方还没有正式支持 50 系列的显卡，
+        所以直接使用 pip 安装再调用 <code> memory_efficient_attention </code> 时会报错提示显卡太新！
+    </p>
+
+    <center>
+        <img style="border-radius: 0.3125em;
+                        box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);"
+            src="https://picx.zhimg.com/v2-329ddc35bdd27a123b13379012f9f467_1440w.jpg" width="80%">
+        <br>
+        <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+                        display: inline-block;
+                        color: #999;
+                        padding: 2px;">错误提示</div>
+    </center>
+
+    <p>
+        所以折腾了一下也是在 autodl 上租的 5090 上跑通了代码。 <br>
+        <br>
+        一个简单的解决方式. <br>
+        <br>
+        cuda: 12.8 <br>
+        <br>
+        torch: 2.7.1 <br>
+        <br>
+        flash_attn: 2.8.0 因为直接使用 pip 安装 flash_attn 时会卡住，所以可以直接在 GitHub 的 release 上下载 whl 文件然后直接安装。 <br>
+        <br>
+        torch 和 flash_attn 其实也可以使用更高版本的只有保证 xformers, torch, flash_attn 三者版本对应就行。<br>
+    </p>
+
+    <p>
+        <b>xformers：</b> <br>
+        <li> 从 github 上 clone 代码 </li>
+        <code>git clone https://github.com/facebookresearch/xformers.git</code> <br>
+        <li>checkout 到合适 torch 版本的分支</li>
+        <code>git checkout v0.0.31</code> <br>
+        <li>编译源码安装</li>
+        <code>pip install -v --no-build-isolation .</code> <br>
+    </p>
+
+</body>
+</html>
