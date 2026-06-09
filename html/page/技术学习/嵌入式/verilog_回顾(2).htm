@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+    
+    <script>hljs.highlightAll();</script>
+    <title>Verilog_回顾(2)</title>
+</head>
+<body>
+    <h1> Verilog_回顾(2) </h1>
+    <p>
+        关于状态机的三段式:
+        <pre>
+            <code>
+                module uart_tx_ctrl (
+                    input           clk,
+                    input           rst_n,
+                    input           send_start,    // 发送触发信号
+                    input     [7:0] tx_data,       // 待发送的8位数据
+                    output  reg     tx_pin,        // 串口发送引脚
+                    output  reg     tx_done        // 发送完成标志
+                );
+                // ==========================================
+                // 状态机定义 (时间线)
+                // ==========================================
+                localparam  IDLE    = 2'b00,       // 空闲状态
+                            START   = 2'b01,       // 发送起始位
+                            DATA    = 2'b10,       // 发送数据位
+                            STOP    = 2'b11;       // 发送停止位
+                reg [1:0] current_state, next_state;
+                // ==========================================
+                // 数据路径：计数器定义 (打工仔)
+                // ==========================================
+                reg [15:0] baud_cnt;               // 波特率计数器（时间计数）
+                reg [2:0]  bit_cnt;                // 数据位计数器（数据计数）
+                wire baud_done = (baud_cnt == 16'd5207); // 假设时钟50M，波特率9600，分频系数约5208
+                wire bit_done  = (bit_cnt == 3'd7);      // 发完了8个bit (0~7)
+                // ==========================================
+                // 第一段：状态转移 (时序逻辑，管时间)
+                // ==========================================
+                always @(posedge clk or negedge rst_n) begin
+                    if (!rst_n)
+                        current_state <= IDLE;
+                    else
+                        current_state <= next_state;
+                end
+                // ==========================================
+                // 第二段：状态跳转 (组合逻辑，管逻辑)
+                // 注意：这里绝对没有 +1 操作，只看信号条件！
+                // ==========================================
+                always @(*) begin
+                    // 默认保持当前状态（防止生成锁存器）
+                    next_state = current_state; 
+                    case (current_state)
+                        IDLE: begin
+                            if (send_start) 
+                                next_state = START; // 老板说开始，就去START
+                        end
+                        START: begin
+                            if (baud_done)          // 打工仔汇报时间到了，就去DATA
+                                next_state = DATA;
+                        end
+                        DATA: begin
+                            if (baud_done && bit_done) // 时间到了，且8个bit发完了，去STOP
+                                next_state = STOP;
+                        end
+                        STOP: begin
+                            if (baud_done)          // 停止位时间到了，回IDLE
+                                next_state = IDLE;
+                        end
+                        default: next_state = IDLE;
+                    endcase
+                end
+                // ==========================================
+                // 第三段：数据输出与计数 (时序逻辑，管搬砖)
+                // 状态机在这里只发号施令，计数器在这里埋头苦干
+                // ==========================================
+                always @(posedge clk or negedge rst_n) begin
+                    if (!rst_n) begin
+                        baud_cnt <= 16'd0;
+                        bit_cnt  <= 3'd0;
+                        tx_pin   <= 1'b1;          // 串口空闲时为高电平
+                        tx_done  <= 1'b0;
+                    end else begin
+                        case (current_state)
+                            IDLE: begin
+                                tx_pin  <= 1'b1;
+                                tx_done <= 1'b0;
+                                baud_cnt <= 16'd0;
+                                bit_cnt  <= 3'd0;  // 清零，准备下一次发送
+                            end
+                            START: begin
+                                tx_pin <= 1'b0;    // 起始位拉低
+                                if (baud_done) 
+                                    baud_cnt <= 16'd0; // 时间到了就清零
+                                else 
+                                    baud_cnt <= baud_cnt + 1'b1; // 没到就接着数
+                            end
+                            DATA: begin
+                                // 移位输出数据
+                                tx_pin <= tx_data[bit_cnt]; 
+                                if (baud_done) begin
+                                    baud_cnt <= 16'd0;
+                                    bit_cnt  <= bit_cnt + 1'b1; // 发完一个bit，数据计数器+1
+                                end else begin
+                                    baud_cnt <= baud_cnt + 1'b1;
+                                end
+                            end
+                            STOP: begin
+                                tx_pin <= 1'b1;    // 停止位拉高
+                                if (baud_done) begin
+                                    baud_cnt <= 16'd0;
+                                    tx_done  <= 1'b1; // 发送完成标志
+                                end else begin
+                                    baud_cnt <= baud_cnt + 1'b1;
+                                end
+                            end
+                        endcase
+                    end
+                end
+                endmodule
+            </code>
+        </pre>
+    </p>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+    
+    <script>hljs.highlightAll();</script>
+    <title>Verilog 回顾</title>
+</head>
+<body>
+    <h1> Verilog 回顾 </h1>
+
+    <h2> 一些语法 </h2>
+
+    <p>
+        模块的结构：
+        <br>
+        <pre> 
+            <code>
+                module [design_name] ( [port_list] );
+                
+                [list_of_input_ports]
+                [list_of_output_ports]
+                
+                [declaration_of_other_signals]
+                
+                [other_module_instantiations_if_required]
+                
+                [behavioral_code_for_this_module]
+                endmodule
+            </code>
+        </pre>
+    </p>
+    
+    <p>
+        Architecture Level 负责把系统按功能划分为高层模块并定义接口，
+        RTL Level 则用 Verilog/VHDL 等硬件描述语言精确实现每个模块的具体功能(在此阶段，诸如电路图、技术库之类的低层实现细节则被忽略。例如，一个控制器模块会由多个 Verilog 文件构成，每个文件分别描述该控制器模块中的某个功能模块。)。
+    </p>
+
+    <p>
+        wire 和 reg 的类型：
+        <pre>
+            <code>
+                wire xxxx
+                reg [xxx:1] xxxx
+            </code>
+        </pre>
+
+        数字形式：
+        <pre>
+            16 // Number 16 in decimal (default)
+            0x10 // Number 16 in hexadecimal (C-style notation - NOT standard Verilog)
+            10000 // Number 16 in binary (but Verilog treats this as decimal 10000!)
+            20 // Number 16 in octal (but Verilog treats this as decimal 20!)
+        </pre>
+
+        数字大小/数值范围:
+        <pre>
+            [size]'[base_format][number]
+            
+            // Where:
+            // size - Number of bits (decimal only)
+            // base_format - 'b (binary), 'd (decimal), 'h (hex), 'o (octal)
+            // number - The value in the specified base
+        </pre>
+    </p>
+
+    <p>
+        模块实现示例:
+        <pre>
+            <code>
+                // Module called "dff" has 3 inputs and 1 output port
+                module dff ( input d, // Data input
+                    input clk, // Clock signal
+                    input rstn, // Active-low synchronous reset
+                    output reg q); // Registered output (must be 'reg' for sequential logic)
+                    
+                    // Sequential logic block: executes on every positive clock edge
+                    always @ (posedge clk) begin
+                    if (!rstn) // Reset condition (active-low: rstn=0 triggers reset)
+                    q <= 0; // Non-blocking assignment: reset output to 0 else q <=d; // Non-blocking assignment: capture input data end
+                endmodule
+            </code>
+        </pre>
+
+        模块实例化示例：
+        <pre>
+            <code>
+                // Instantiate the dff module
+                dff my_dff (
+                    .d(data_input), // Connect 'd' port to 'data_input' signal
+                    .clk(clock_signal), // Connect 'clk' port to 'clock_signal'
+                    .rstn(reset_signal), // Connect 'rstn' port to 'reset_signal'
+                    .q(output_q) // Connect 'q' port to 'output_q' signal
+                );
+            </code>
+        </pre>
+    </p>
+
+    <p>
+        <pre>
+            阻塞赋值 = 和非阻塞赋值 <=
+            testbench 中使用 =
+            rtl 中使用 <=
+        </pre>
+        
+        <pre>
+            <code>
+                initial begin
+                a = 0;
+                b = 0;
+                #10 a = 1;
+                end
+            </code>
+
+            <code>
+                always @(posedge clk) begin
+                q <= d; end
+            </code>
+        </pre>
+        
+        <b>
+            <ul>
+                <li>组合逻辑：=</li>
+                <li>时序逻辑：<= testbench 激励：多数情况下用=</li>
+            </ul>
+        </b>
+    </p>
+
+    <h2> 仿真 </h2>
+
+    <p>
+        输入信号通常声明为 reg，输出信号通常声明为 wire
+        <br>
+
+        timescale
+        
+        用于定义仿真的时间单位和时间精度。
+
+        <pre>
+            <code>
+                `timescale 1ns / 1ps
+            </code>
+        </pre>
+
+        testbench
+        <pre>
+            <code>
+                module tb_top;
+                
+                endmodule
+            </code>
+        </pre>
+        
+        initial 块只在仿真开始时执行一次，常用于初始化信号和施加测试激励。
+        <pre>
+            <code>
+                initial begin
+                    a = 0;
+                    b = 0;
+                    
+                    #10 a = 1;
+                    #10 b = 1;
+                    #10 a = 0;
+                end
+            </code>
+        </pre>
+
+        always 产生时钟
+        <pre>
+            <code>
+                reg clk;
+                
+                initial begin
+                clk = 0;
+                end
+                
+                always #5 clk = ~clk;
+        </pre>
+
+        复位信号
+        <pre>
+            <code>
+                reg rst_n;
+                
+                initial begin
+                rst_n = 0;
+                #20;
+                rst_n = 1;
+                end
+            </code>
+        </pre>
+
+        延时
+        <pre>
+            <code>
+                #10;
+                a = 1;
+                #20;
+                a = 0;
+            </code>
+        </pre>
+
+        wait 等待某条件成立
+        <pre>
+            <code>
+                initial begin
+                    start = 1;
+                    #10 start = 0;
+                    
+                    wait(done == 1);
+                    
+                    #10;
+                    $finish;
+                end
+            </code>
+        </pre>
+
+        @(posedge clk) 和 @(negedge clk)
+        
+        等待时钟边沿。
+
+        <pre>
+            <code>
+                initial begin
+                    rst_n = 0;
+                    start = 0;
+                    data_in = 0;
+                    
+                    repeat(5) @(posedge clk);
+                    rst_n = 1;
+                    
+                    @(posedge clk);
+                    start = 1;
+                    
+                    @(posedge clk);
+                    start = 0;
+                end
+            </code>
+        </pre>
+
+        $display
+        
+        打印仿真信息。
+
+        <pre>
+            <code>
+                initial begin
+                a = 0; b = 0; #10;
+                $display("a=%b b=%b y=%b", a, b, y);
+                
+                a = 1; b = 0; #10;
+                $display("a=%b b=%b y=%b", a, b, y);
+                
+                a = 1; b = 1; #10;
+                $display("a=%b b=%b y=%b", a, b, y);
+                end
+            </code>
+        </pre>
+
+        $monitor
+        
+        只要变量变化，就自动打印。
+        
+        <pre>
+            <code>
+                initial begin
+                    $monitor("time=%t a=%b b=%b y=%b", $time, a, b, y);
+                end
+            </code>
+        </pre>
+
+        $finish
+        
+        结束仿真。
+
+        $stop
+        
+        暂停仿真，不完全结束。
+    </p>
+
+    <p>
+        一个完整的 testbench 示例：
+        <pre>
+            <code>
+                `timescale 1ns / 1ps
+                
+                module tb_counter;
+                
+                reg clk;
+                reg rst_n;
+                reg en;
+                wire [3:0] count;
+                
+                counter uut (
+                .clk(clk),
+                .rst_n(rst_n),
+                .en(en),
+                .count(count)
+                );
+                
+                // clock: 100MHz
+                initial begin
+                clk = 0;
+                end
+                
+                always #5 clk = ~clk;
+                
+                // stimulus
+                initial begin
+                rst_n = 0;
+                en = 0;
+                
+                repeat(5) @(posedge clk);
+                rst_n = 1;
+                
+                repeat(2) @(posedge clk);
+                en = 1;
+                
+                repeat(10) @(posedge clk);
+                en = 0;
+                
+                repeat(5) @(posedge clk);
+                
+                $finish;
+                end
+                
+                // print
+                initial begin
+                $monitor("time=%t rst_n=%b en=%b count=%d",
+                $time, rst_n, en, count);
+                end
+                
+                endmodule
+            </code>
+        </pre>
+    </p>
+
+</body>
+</html>
